@@ -1,25 +1,5 @@
 # Coding Snippets
 
-Store reusable implementation snippets, commands, scripts, configuration examples, and known-good patterns here.
+This folder contains reusable implementation snippets, commands, scripts, configuration examples, and known-good patterns.
 
-## Entry Template
-
-````md
-# Snippet Title
-
-## Context
-
-
-## Snippet
-
-```text
-
-```
-
-## Notes
-
-
-## Source
-
-
-````
+Treat these documents as read-only during program execution. If a useful implementation pattern is discovered while building, capture it in `../../learnings` or `../../output/documentation`.

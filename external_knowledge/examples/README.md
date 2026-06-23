@@ -1,23 +1,5 @@
 # Examples
 
-Store sample requests, responses, screenshots, payloads, workflows, test data, and demo artifacts here.
+This folder contains sample requests, responses, screenshots, payloads, workflows, test data, and demo artifacts.
 
-## Entry Template
-
-```md
-# Example Title
-
-## Scenario
-
-
-## Input
-
-
-## Expected Output
-
-
-## Notes
-
-
-```
-
+Treat these documents as read-only during program execution. If a new example is discovered while building or testing, capture it in `../../learnings` or `../../output/documentation`.

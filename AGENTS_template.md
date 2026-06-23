@@ -7,8 +7,11 @@ This template defines how the team uses the workspace structure to take an idea 
 | Folder | Purpose |
 |---|---|
 | `team` | Role definitions and responsibilities for the 12-person responsible minimum team. |
-| `program` | Program-management trackers for intake, planning, execution, release, status, decisions, risks, and retrospectives. |
-| `external_knowledge` | Domain knowledge, coding snippets, examples, prior art, and references used to execute the program. |
+| `program` | Program-level trackers, global program documents, and sprint records. |
+| `program/trackers` | Reusable and active trackers for intake, requirements, backlog, delivery, release, risks, decisions, metrics, and reporting. |
+| `program/program_documents` | Global planning, program charter, governance, stakeholder context, and other non-sprint program documentation. |
+| `program/sprints` | Sprint index and sprint-specific plans, execution notes, demo notes, and retrospectives. |
+| `external_knowledge` | Read-only domain knowledge, coding snippets, examples, prior art, and references used to execute the program. |
 | `output` | Produced work, including source repositories, documentation, deliverables, and release packages. |
 | `learnings` | Lessons, discoveries, postmortems, and process improvements captured during execution. |
 
@@ -36,7 +39,7 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary role:** Product & Delivery Manager  
 **Reviewer:** Requirements Analyst
 
-1. Record the idea in `program/idea_intake_tracker.md`.
+1. Record the idea in `program/trackers/idea_intake_tracker.md`.
 2. Define the problem, target users, expected value, urgency, and initial risks.
 3. Decide whether the idea is rejected, parked, sent to research, or approved for requirements.
 
@@ -46,31 +49,30 @@ This template defines how the team uses the workspace structure to take an idea 
 - Initial business value statement.
 - Intake decision.
 
-### 2. Gather External Knowledge
+### 2. Consult External Knowledge
 
 **Primary roles:** Requirements Analyst, UX/UI Designer, Solution Architect  
 **Support roles:** Security Reviewer, Documentation & Customer Feedback Owner
 
-1. Add domain context, prior art, examples, references, and snippets to `external_knowledge`.
-2. Record each useful source in `external_knowledge/knowledge_index.md`.
-3. Link relevant knowledge to requirements, architecture, tests, or decisions.
+1. Review existing domain context, prior art, examples, references, and snippets in `external_knowledge`.
+2. Cite relevant knowledge in requirements, architecture notes, test notes, or decisions.
+3. If new external knowledge is needed, record the need in `program/trackers/dependency_tracker.md` or `program/trackers/raid_log.md`; do not update `external_knowledge` during program execution.
 
 **Deliveries**
 
-- Knowledge index entries.
-- Domain notes.
-- Prior-art summaries.
-- Technical references or snippets.
+- References to relevant existing knowledge.
+- Open research needs recorded as dependencies or risks.
+- Requirement, design, architecture, or test notes informed by the reference material.
 
 ### 3. Convert Idea To Requirements
 
 **Primary role:** Requirements Analyst  
 **Reviewers:** Product & Delivery Manager, UX/UI Designer, Solution Architect, QA Engineer, Security Reviewer
 
-1. Write requirements in `program/requirements_tracker.md`.
+1. Write requirements in `program/trackers/requirements_tracker.md`.
 2. Define user stories, acceptance criteria, business rules, and edge cases.
 3. Confirm security, privacy, accessibility, operational, and testability needs.
-4. Move approved work into `program/backlog_tracker.md`.
+4. Move approved work into `program/trackers/backlog_tracker.md`.
 
 **Deliveries**
 
@@ -101,8 +103,8 @@ This template defines how the team uses the workspace structure to take an idea 
 **Reviewers:** Security Reviewer, DevOps/SRE Engineer, Code Quality Reviewer, Engineering team
 
 1. Define architecture, data model, APIs, integrations, infrastructure needs, and non-functional requirements.
-2. Record important choices in `program/decision_log.md`.
-3. Add technical risks, assumptions, issues, and dependencies to `program/raid_log.md` and `program/dependency_tracker.md`.
+2. Record important choices in `program/trackers/decision_log.md`.
+3. Add technical risks, assumptions, issues, and dependencies to `program/trackers/raid_log.md` and `program/trackers/dependency_tracker.md`.
 4. Confirm the implementation can be broken into sprint-sized work.
 
 **Deliveries**
@@ -117,10 +119,10 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary role:** Product & Delivery Manager  
 **Reviewers:** All sprint roles
 
-1. Refine and prioritize work in `program/backlog_tracker.md`.
-2. Confirm team capacity in `program/resource_capacity_tracker.md`.
-3. Commit sprint work in `program/sprint_plan_tracker.md`.
-4. Confirm milestones and release targets in `program/milestone_release_tracker.md`.
+1. Refine and prioritize work in `program/trackers/backlog_tracker.md`.
+2. Confirm team capacity in `program/trackers/resource_capacity_tracker.md`.
+3. Commit sprint work in `program/sprints` using `program/sprints/sprint_record_template.md`.
+4. Confirm milestones and release targets in `program/trackers/milestone_release_tracker.md`.
 
 **Deliveries**
 
@@ -137,7 +139,7 @@ This template defines how the team uses the workspace structure to take an idea 
 1. Implement features, fixes, integrations, tests, and supporting documentation in `output/repositories`.
 2. Keep source code in a git repository when possible.
 3. Link implementation work to backlog items, requirements, and decisions.
-4. Capture useful implementation patterns in `external_knowledge/coding_snippets` or `learnings`.
+4. Capture useful implementation patterns in `learnings` or `output/documentation`.
 
 **Deliveries**
 
@@ -166,7 +168,7 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary role:** QA / Test Automation Engineer  
 **Reviewers:** Product & Delivery Manager, Requirements Analyst
 
-1. Prepare and track testing in `program/test_readiness_tracker.md`.
+1. Prepare and track testing in `program/trackers/test_readiness_tracker.md`.
 2. Run automated, manual, regression, integration, end-to-end, UAT, and security-related tests as needed.
 3. Verify acceptance criteria and report defects.
 4. Confirm release quality or recommend no-go.
@@ -183,10 +185,10 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary roles:** DevOps/SRE Engineer, Product & Delivery Manager  
 **Reviewers:** QA Engineer, Security Reviewer, Documentation & Customer Feedback Owner
 
-1. Update `program/release_deployment_checklist.md`.
+1. Update `program/trackers/release_deployment_checklist.md`.
 2. Confirm deployment steps, rollback plan, monitoring, logging, alerts, support readiness, and documentation.
 3. Prepare release notes and user documentation in `output/documentation`.
-4. Make the go/no-go decision in `program/milestone_release_tracker.md`.
+4. Make the go/no-go decision in `program/trackers/milestone_release_tracker.md`.
 
 **Deliveries**
 
@@ -204,7 +206,7 @@ This template defines how the team uses the workspace structure to take an idea 
 1. Deploy using the approved release process.
 2. Store release artifacts in `output/release_packages` when applicable.
 3. Run smoke tests and monitor logs, metrics, and alerts.
-4. Communicate deployment status through `program/stakeholder_communication_tracker.md`.
+4. Communicate deployment status through `program/trackers/stakeholder_communication_tracker.md`.
 
 **Deliveries**
 
@@ -219,7 +221,7 @@ This template defines how the team uses the workspace structure to take an idea 
 **Support roles:** Product & Delivery Manager, QA Engineer, Engineers
 
 1. Monitor production behavior, support tickets, user feedback, defects, and incidents.
-2. Record customer themes and known issues in `output/documentation` or `program/backlog_tracker.md`.
+2. Record customer themes and known issues in `output/documentation` or `program/trackers/backlog_tracker.md`.
 3. Capture discoveries in `learnings/learning_log.md`.
 4. Create postmortems for incidents using `learnings/incident_postmortem_template.md`.
 
@@ -235,7 +237,7 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary role:** Product & Delivery Manager  
 **Participants:** Whole team
 
-1. Record improvement actions in `program/retrospective_action_tracker.md`.
+1. Record improvement actions in `program/trackers/retrospective_action_tracker.md`.
 2. Convert repeat issues into backlog items, tests, documentation, automation, or standards.
 3. Re-prioritize the backlog based on shipped value, open risks, customer feedback, and technical debt.
 4. Start the next sprint at Step 6, or return to Step 1 for new ideas.
@@ -260,4 +262,3 @@ A release should not proceed unless these are complete:
 - DevOps/SRE confirms deployment, rollback, monitoring, and support readiness.
 - Documentation and release notes are ready.
 - Product gives final go approval.
-

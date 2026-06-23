@@ -26,6 +26,18 @@ Provides independent engineering review so code is maintainable, consistent, tes
 - Acts as the independent reviewer for engineering quality.
 - Reviews high-risk changes before they are merged.
 
+## Document Update Responsibilities
+
+| Document | When This Role Updates It |
+|---|---|
+| `program/trackers/decision_log.md` | When review findings lead to coding standards, architecture constraints, refactoring decisions, or merge-policy changes. |
+| `program/trackers/backlog_tracker.md` | When review findings create technical debt, refactoring work, test gaps, or quality-improvement tasks. |
+| `program/trackers/raid_log.md` | When code quality issues create release risk, maintainability risk, testability risk, or operational risk. |
+| `program/program_documents/governance_model_template.md` | When engineering review gates, merge rules, or quality escalation paths are defined or changed. |
+| `output/documentation` | When engineering standards, review checklists, architecture constraints, or developer guidance need to be documented. |
+| `learnings/learning_log.md` | When recurring quality issues reveal a process, testing, design, or implementation lesson. |
+| `learnings/process_improvement_template.md` | When a code review pattern should become a formal process change. |
+
 ## Collaborates With
 
 - Solution Architect for architecture consistency.
@@ -33,4 +45,3 @@ Provides independent engineering review so code is maintainable, consistent, tes
 - QA Engineer for test coverage expectations.
 - Security Reviewer when code quality overlaps with security risk.
 - DevOps/SRE Engineer for deployment-impacting changes.
-

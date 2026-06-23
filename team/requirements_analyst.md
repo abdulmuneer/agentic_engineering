@@ -26,6 +26,18 @@ Turns approved ideas into clear, testable requirements. This role protects the t
 - Acts as the independent reviewer for requirement completeness and clarity.
 - Flags vague, conflicting, or untestable requirements before they enter development.
 
+## Document Update Responsibilities
+
+| Document | When This Role Updates It |
+|---|---|
+| `program/trackers/requirements_tracker.md` | When an idea is approved for requirements, during refinement, after review feedback, and when acceptance criteria or business rules change. |
+| `program/trackers/backlog_tracker.md` | When requirements are split into backlog items, reprioritized, clarified, blocked, or marked ready for sprint planning. |
+| `program/trackers/raid_log.md` | When requirements reveal assumptions, risks, scope issues, or unresolved questions. |
+| `program/trackers/dependency_tracker.md` | When a requirement depends on product decisions, external input, data access, design assets, APIs, or compliance review. |
+| `program/trackers/change_request_tracker.md` | When requirement changes affect approved scope, timeline, risk, or release commitments. |
+| `program/trackers/test_readiness_tracker.md` | Before QA planning, to confirm acceptance criteria and requirement traceability are testable. |
+| `learnings/learning_log.md` | When a requirement gap, ambiguity pattern, or repeated source of rework is discovered. |
+
 ## Collaborates With
 
 - Product & Delivery Manager for priorities and business intent.
@@ -33,4 +45,3 @@ Turns approved ideas into clear, testable requirements. This role protects the t
 - Solution Architect for technical feasibility.
 - QA Engineer for testability.
 - Security Reviewer for privacy, access, and compliance requirements.
-

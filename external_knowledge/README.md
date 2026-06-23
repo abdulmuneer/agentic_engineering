@@ -2,7 +2,7 @@
 
 This folder stores outside knowledge that helps the team execute the program and development work.
 
-Use it for domain knowledge, coding snippets, examples, prior art, standards, vendor notes, research findings, API references, and implementation patterns that are useful but not part of the product source code.
+Treat this folder as read-only during program execution. Team roles may consult and cite material here, but they should not edit documents in this folder.
 
 ## Suggested Structure
 
@@ -16,8 +16,7 @@ Use it for domain knowledge, coding snippets, examples, prior art, standards, ve
 
 ## Rules
 
-- Include source, date, and owner whenever possible.
+- Do not update documents in this folder as part of sprint or program execution.
+- If new knowledge is needed, record the need in `../program/trackers/dependency_tracker.md` or `../program/trackers/raid_log.md`.
+- If a discovery is made during execution, capture it in `../learnings`, `../output/documentation`, or the relevant program tracker.
 - Do not store secrets, credentials, private customer data, or license-restricted material here.
-- Summarize why each item matters to the current program.
-- Link relevant knowledge from requirements, architecture notes, tests, or decisions.
-

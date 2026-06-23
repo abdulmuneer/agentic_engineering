@@ -9,8 +9,8 @@ The goal is to make the work repeatable: every idea should move through clear ow
 | Folder | Purpose |
 |---|---|
 | `team` | Defines the 12 core roles needed to run a responsible minimum software organization. |
-| `program` | Contains program-management templates and trackers for planning, execution, releases, risks, decisions, and reporting. |
-| `external_knowledge` | Stores domain knowledge, coding snippets, examples, prior art, and external references that help the team execute well. |
+| `program` | Contains program-level trackers, global program documents, and sprint records. |
+| `external_knowledge` | Read-only reference material such as domain knowledge, coding snippets, examples, prior art, and external references. |
 | `output` | Stores the actual work produced by the program, including source repositories, documentation, deliverables, and release packages. |
 | `learnings` | Captures discoveries, postmortems, technical lessons, and process improvements during execution. |
 | `AGENTS_template.md` | Describes the full step-by-step process for moving an idea through the team and into production. |
@@ -56,11 +56,11 @@ The detailed process is documented in `AGENTS_template.md`.
 
 ## How To Start With A New Idea
 
-1. Add the idea to `program/idea_intake_tracker.md`.
-2. Add supporting context to `external_knowledge` if research, examples, or domain knowledge are needed.
-3. Convert the approved idea into requirements in `program/requirements_tracker.md`.
-4. Add delivery work to `program/backlog_tracker.md`.
-5. Plan the sprint in `program/sprint_plan_tracker.md`.
+1. Add the idea to `program/trackers/idea_intake_tracker.md`.
+2. Consult `external_knowledge` for existing research, examples, domain knowledge, and prior art.
+3. Convert the approved idea into requirements in `program/trackers/requirements_tracker.md`.
+4. Add delivery work to `program/trackers/backlog_tracker.md`.
+5. Plan the sprint in `program/sprints` using `program/sprints/sprint_record_template.md`.
 6. Build and store work products under `output`.
 7. Capture discoveries in `learnings`.
 
@@ -69,4 +69,3 @@ The detailed process is documented in `AGENTS_template.md`.
 A production release should not proceed unless requirements, design, architecture, code quality, security, QA, deployment, documentation, and support readiness have been reviewed by the responsible roles.
 
 This repository is not just a folder structure. It is intended to be a working playbook for repeatable software delivery.
-

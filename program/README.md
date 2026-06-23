@@ -1,17 +1,21 @@
 # Program Folder
 
-This folder stores the operating trackers used by the Product & Delivery Manager and the wider team to move an idea from intake to production.
+This folder contains program-level operating material. It is split into reusable trackers, general program documentation, and sprint-specific records.
+
+## Structure
+
+| Folder | Purpose |
+|---|---|
+| `trackers` | Reusable templates and active trackers for idea intake, requirements, backlog, risks, dependencies, releases, testing, communication, KPIs, and retrospectives. |
+| `program_documents` | General program documentation that is not tied to a single sprint, such as global plans, program charters, governance notes, and strategy documents. |
+| `sprints` | Sprint index, sprint records, sprint plans, sprint reviews, and sprint retrospectives. |
 
 ## How To Use
 
-1. Create or update the idea in `idea_intake_tracker.md`.
-2. Convert approved ideas into requirements using `requirements_tracker.md`.
-3. Add delivery work to `backlog_tracker.md`.
-4. Plan releases through `roadmap_tracker.md`, `milestone_release_tracker.md`, and `sprint_plan_tracker.md`.
-5. Track execution using `raid_log.md`, `dependency_tracker.md`, `decision_log.md`, `change_request_tracker.md`, and `resource_capacity_tracker.md`.
-6. Validate release readiness with `test_readiness_tracker.md` and `release_deployment_checklist.md`.
-7. Report progress through `status_report_template.md`, `stakeholder_communication_tracker.md`, and `metrics_kpi_tracker.md`.
-8. Capture improvements in `retrospective_action_tracker.md` and move long-term discoveries to `../learnings`.
+1. Manage reusable and cross-sprint tracking in `trackers`.
+2. Store broad planning and governance material in `program_documents`.
+3. Store each sprint's committed plan, execution notes, demo notes, and retrospective in `sprints`.
+4. Move long-term discoveries and lessons to `../learnings`.
 
 ## Tracker Ownership
 

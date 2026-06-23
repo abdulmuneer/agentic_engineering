@@ -26,6 +26,18 @@ Owns user-facing communication, support knowledge, and the feedback loop from re
 - Reviews whether released features are understandable to users and supportable by the company.
 - Flags repeated support issues that should become product, documentation, or quality backlog items.
 
+## Document Update Responsibilities
+
+| Document | When This Role Updates It |
+|---|---|
+| `output/documentation` | During feature development, before release, after release, and whenever user docs, API docs, help content, release notes, or support notes change. |
+| `program/trackers/stakeholder_communication_tracker.md` | When release communication, support communication, customer updates, known issue notices, or post-release summaries are planned or sent. |
+| `program/trackers/backlog_tracker.md` | When customer feedback, support themes, documentation gaps, or repeated issues should become product, quality, or documentation work. |
+| `program/trackers/requirements_tracker.md` | When feedback needs to be converted into new or changed requirements. |
+| `program/trackers/metrics_kpi_tracker.md` | When support volume, documentation usage, customer feedback themes, or adoption indicators are reviewed. |
+| `learnings/learning_log.md` | When customer feedback, support tickets, or documentation gaps reveal a lesson for future execution. |
+| `learnings/process_improvement_template.md` | When recurring support or documentation issues should become a process improvement. |
+
 ## Collaborates With
 
 - Product & Delivery Manager for prioritizing user feedback.
@@ -33,4 +45,3 @@ Owns user-facing communication, support knowledge, and the feedback loop from re
 - UX/UI Designer for confusing workflows and usability gaps.
 - QA Engineer for reproduced customer issues.
 - DevOps/SRE Engineer for release and incident communication.
-

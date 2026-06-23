@@ -1,26 +1,5 @@
 # Domain Knowledge
 
-Store business, industry, regulatory, customer, workflow, and terminology knowledge here.
+This folder contains business, industry, regulatory, customer, workflow, and terminology knowledge.
 
-## Entry Template
-
-```md
-# Topic
-
-## Source
-
-- Source:
-- Date:
-- Owner:
-
-## Summary
-
-
-## Relevance
-
-
-## Open Questions
-
-
-```
-
+Treat these documents as read-only during program execution. If new domain knowledge is needed, record the need in `../../program/trackers/dependency_tracker.md` or `../../program/trackers/raid_log.md`.
