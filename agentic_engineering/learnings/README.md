@@ -17,5 +17,7 @@ Use it for implementation lessons, unexpected constraints, bug patterns, operati
 
 - Keep entries specific and actionable.
 - Link back to related requirements, decisions, defects, releases, or incidents.
-- Convert repeatable lessons into checklists, tests, documentation, or backlog items.
-
+- Convert repeatable lessons into checklists, tests, evals, skills, documentation, permission rules, runbooks, or backlog items.
+- Link lessons from agentic work to the relevant work packet.
+- Promote repeated successful workflows to `../agentic/skill_registry.md`.
+- Promote repeated failures or review findings to `../agentic/eval_registry.md` or tests.

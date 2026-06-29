@@ -20,6 +20,8 @@ Use this checklist before deploying to production.
 - CI pipeline passed.
 - Regression tests passed.
 - Security review completed.
+- Agentic work packets reviewed for agent-assisted changes.
+- Tool permissions, external actions, and skipped checks accepted.
 - Database migrations reviewed.
 - Configuration and secrets verified.
 - Monitoring and alerts verified.
@@ -40,4 +42,4 @@ Use this checklist before deploying to production.
 - Release notes published.
 - Incidents or anomalies recorded.
 - Retrospective actions captured.
-
+- Skill, eval, runbook, or process promotion candidates captured.

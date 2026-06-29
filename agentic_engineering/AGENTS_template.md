@@ -1,12 +1,13 @@
 # AGENTS Template
 
-This template defines how the team uses the workspace structure to take an idea from intake to production and then repeat through the next sprint.
+This template defines how the team uses the workspace structure to take an idea from intake to production and then repeat through the next sprint. It supports both human-led work and bounded agentic workflows.
 
 ## Folder Structure
 
 | Folder | Purpose |
 |---|---|
 | `team` | Role definitions and responsibilities for the 12-person responsible minimum team. |
+| `agentic` | Agentic operating controls: loop library, permission model, work packet template, cadence controls, skill registry, and eval registry. |
 | `program` | Program-level trackers, global program documents, and sprint records. |
 | `program/trackers` | Reusable and active trackers for intake, requirements, backlog, delivery, release, risks, decisions, metrics, and reporting. |
 | `program/program_documents` | Global planning, program charter, governance, stakeholder context, and other non-sprint program documentation. |
@@ -31,6 +32,19 @@ This template defines how the team uses the workspace structure to take an idea 
 | `team/security_reviewer.md` | Security Reviewer |
 | `team/devops_sre_release_engineer.md` | DevOps / SRE / Release Engineer |
 | `team/documentation_customer_feedback_owner.md` | Documentation & Customer Feedback Owner |
+
+Roles are used as lenses and gates. They may be staffed by humans, supported by agents, or encoded as reusable skills and review prompts. A named accountable human owns approval decisions even when agents perform the execution.
+
+## Agentic Operating Rules
+
+Use agents when they improve throughput without weakening evidence, reviewability, or accountability.
+
+1. **Bound the loop.** Pick a loop from `agentic/loop_library.md` before starting agent work.
+2. **Scope permissions.** Classify the task using `agentic/permission_model.md`; require human approval for destructive, external, sensitive, or production-affecting actions.
+3. **Limit work in progress.** Apply `agentic/cadence_controls.md` so agents do not outrun human review capacity.
+4. **Return a work packet.** Every agent-assisted implementation, review, research, or release task should produce the fields in `agentic/work_packet_template.md`.
+5. **Review evidence, not confidence.** Humans should inspect changed files, tests run, skipped checks, assumptions, and residual risks.
+6. **Compound learning.** Repeated successful patterns should be promoted into `agentic/skill_registry.md`, `agentic/eval_registry.md`, tests, runbooks, or process updates.
 
 ## End-To-End Operating Process
 
@@ -121,14 +135,17 @@ This template defines how the team uses the workspace structure to take an idea 
 
 1. Refine and prioritize work in `program/trackers/backlog_tracker.md`.
 2. Confirm team capacity in `program/trackers/resource_capacity_tracker.md`.
-3. Commit sprint work in `program/sprints` using `program/sprints/sprint_record_template.md`.
-4. Confirm milestones and release targets in `program/trackers/milestone_release_tracker.md`.
+3. Classify work mode: human-led, agent-assisted, or agent-executed with human review.
+4. Confirm agentic WIP limits, review capacity, and safe overnight work using `agentic/cadence_controls.md`.
+5. Commit sprint work in `program/sprints` using `program/sprints/sprint_record_template.md`.
+6. Confirm milestones and release targets in `program/trackers/milestone_release_tracker.md`.
 
 **Deliveries**
 
 - Sprint goal.
 - Sprint backlog.
 - Capacity view.
+- Agentic work mode and cadence plan.
 - Milestone and release plan.
 
 ### 7. Develop
@@ -136,10 +153,12 @@ This template defines how the team uses the workspace structure to take an idea 
 **Primary roles:** Backend Engineer, Frontend Engineer, Integration Engineer  
 **Reviewers:** Solution Architect, Code Quality Reviewer, Security Reviewer, QA Engineer
 
-1. Implement features, fixes, integrations, tests, and supporting documentation in `output/repositories`.
-2. Keep source code in a git repository when possible.
-3. Link implementation work to backlog items, requirements, and decisions.
-4. Capture useful implementation patterns in `learnings` or `output/documentation`.
+1. Select the correct implementation loop from `agentic/loop_library.md`.
+2. Implement features, fixes, integrations, tests, and supporting documentation in `output/repositories`.
+3. Keep source code in a git repository when possible.
+4. Link implementation work to backlog items, requirements, decisions, and work packets.
+5. Capture context used, files changed, commands run, tests passed or skipped, assumptions, risks, and next actions in a work packet.
+6. Capture useful implementation patterns in `learnings` or `output/documentation`.
 
 **Deliveries**
 
@@ -147,6 +166,7 @@ This template defines how the team uses the workspace structure to take an idea 
 - Tests.
 - Integration work.
 - Developer documentation.
+- Agentic work packet when agents were used.
 
 ### 8. Review Code And Security
 
@@ -154,13 +174,16 @@ This template defines how the team uses the workspace structure to take an idea 
 **Support roles:** Solution Architect, Engineers
 
 1. Review code for correctness, maintainability, standards, test coverage, and architectural fit.
-2. Review security-sensitive areas such as authentication, authorization, data handling, secrets, dependencies, and logging.
-3. Block merge or release when unresolved quality or security issues exceed the agreed threshold.
+2. Review the agentic work packet before trusting any summary.
+3. Review security-sensitive areas such as authentication, authorization, data handling, secrets, dependencies, and logging.
+4. Confirm tool permissions and external side effects were appropriate for the task.
+5. Block merge or release when unresolved quality, security, evidence, or permission issues exceed the agreed threshold.
 
 **Deliveries**
 
 - Code review findings.
 - Security review findings.
+- Agentic evidence review findings.
 - Merge approval or required changes.
 
 ### 9. Test
@@ -171,13 +194,16 @@ This template defines how the team uses the workspace structure to take an idea 
 1. Prepare and track testing in `program/trackers/test_readiness_tracker.md`.
 2. Run automated, manual, regression, integration, end-to-end, UAT, and security-related tests as needed.
 3. Verify acceptance criteria and report defects.
-4. Confirm release quality or recommend no-go.
+4. Record which checks were run by agents, which were run by humans, and which were skipped.
+5. Promote repeated defect patterns into tests or evals.
+6. Confirm release quality or recommend no-go.
 
 **Deliveries**
 
 - Test plans.
 - Test results.
 - Defect reports.
+- Eval or regression promotion candidates.
 - Release quality assessment.
 
 ### 10. Prepare Release
@@ -187,8 +213,9 @@ This template defines how the team uses the workspace structure to take an idea 
 
 1. Update `program/trackers/release_deployment_checklist.md`.
 2. Confirm deployment steps, rollback plan, monitoring, logging, alerts, support readiness, and documentation.
-3. Prepare release notes and user documentation in `output/documentation`.
-4. Make the go/no-go decision in `program/trackers/milestone_release_tracker.md`.
+3. Confirm agent-generated or agent-assisted changes have complete work packets and no unresolved high-risk findings.
+4. Prepare release notes and user documentation in `output/documentation`.
+5. Make the go/no-go decision in `program/trackers/milestone_release_tracker.md`.
 
 **Deliveries**
 
@@ -196,6 +223,7 @@ This template defines how the team uses the workspace structure to take an idea 
 - Deployment plan.
 - Rollback plan.
 - Documentation and release notes.
+- Agentic release evidence.
 - Go/no-go decision.
 
 ### 11. Deploy To Production
@@ -223,13 +251,15 @@ This template defines how the team uses the workspace structure to take an idea 
 1. Monitor production behavior, support tickets, user feedback, defects, and incidents.
 2. Record customer themes and known issues in `output/documentation` or `program/trackers/backlog_tracker.md`.
 3. Capture discoveries in `learnings/learning_log.md`.
-4. Create postmortems for incidents using `learnings/incident_postmortem_template.md`.
+4. Identify whether the discovery should become a test, eval, skill, permission rule, runbook, or process improvement.
+5. Create postmortems for incidents using `learnings/incident_postmortem_template.md`.
 
 **Deliveries**
 
 - Monitoring notes.
 - Support feedback.
 - Learning log entries.
+- Skill, eval, test, or process promotion candidates.
 - Follow-up backlog items.
 
 ### 13. Retrospective And Next Sprint
@@ -238,15 +268,17 @@ This template defines how the team uses the workspace structure to take an idea 
 **Participants:** Whole team
 
 1. Record improvement actions in `program/trackers/retrospective_action_tracker.md`.
-2. Convert repeat issues into backlog items, tests, documentation, automation, or standards.
-3. Re-prioritize the backlog based on shipped value, open risks, customer feedback, and technical debt.
-4. Start the next sprint at Step 6, or return to Step 1 for new ideas.
+2. Convert repeat issues into backlog items, tests, documentation, automation, skills, evals, permission rules, or standards.
+3. Review agentic metrics: accepted output, rework, review burden, token or CI cost, human interruptions, and unresolved risks.
+4. Re-prioritize the backlog based on shipped value, open risks, customer feedback, technical debt, and agentic operating load.
+5. Start the next sprint at Step 6, or return to Step 1 for new ideas.
 
 **Deliveries**
 
 - Retrospective actions.
 - Updated backlog.
 - Updated risks and decisions.
+- Updated skills, evals, or agentic controls when needed.
 - Next sprint plan.
 
 ## Production Gate Summary
@@ -261,4 +293,6 @@ A release should not proceed unless these are complete:
 - QA confirms acceptance criteria and regression status.
 - DevOps/SRE confirms deployment, rollback, monitoring, and support readiness.
 - Documentation and release notes are ready.
+- Agentic work packets are complete for agent-generated or agent-assisted changes.
+- Tool permissions, external actions, and skipped checks are reviewed.
 - Product gives final go approval.

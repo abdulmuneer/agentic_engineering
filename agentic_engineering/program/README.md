@@ -15,7 +15,8 @@ This folder contains program-level operating material. It is split into reusable
 1. Manage reusable and cross-sprint tracking in `trackers`.
 2. Store broad planning and governance material in `program_documents`.
 3. Store each sprint's committed plan, execution notes, demo notes, and retrospective in `sprints`.
-4. Move long-term discoveries and lessons to `../learnings`.
+4. Use `../agentic` to select loops, permissions, cadence controls, work packets, skills, and evals for agent-assisted work.
+5. Move long-term discoveries and lessons to `../learnings`.
 
 ## Tracker Ownership
 
@@ -37,4 +38,3 @@ This folder contains program-level operating material. It is split into reusable
 | Stakeholder communication | Product & Delivery Manager | Documentation Owner |
 | Metrics and KPIs | Product & Delivery Manager | DevOps/SRE, Documentation Owner |
 | Retrospective actions | Product & Delivery Manager | Whole team |
-

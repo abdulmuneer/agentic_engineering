@@ -19,4 +19,5 @@ Treat this folder as read-only during program execution. Team roles may consult 
 - Do not update documents in this folder as part of sprint or program execution.
 - If new knowledge is needed, record the need in `../program/trackers/dependency_tracker.md` or `../program/trackers/raid_log.md`.
 - If a discovery is made during execution, capture it in `../learnings`, `../output/documentation`, or the relevant program tracker.
+- Promote validated knowledge into this folder only through a reviewed knowledge update, with source, owner, date, and reason recorded in `knowledge_index.md`.
 - Do not store secrets, credentials, private customer data, or license-restricted material here.

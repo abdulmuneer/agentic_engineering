@@ -24,3 +24,11 @@ This folder stores reusable tracker templates and active cross-sprint trackers f
 | `metrics_kpi_tracker.md` | Tracks product, quality, delivery, reliability, support, and security metrics. |
 | `retrospective_action_tracker.md` | Tracks improvement actions from retrospectives, releases, and incidents. |
 
+## Agentic Tracking
+
+When agents are used, trackers should link to:
+
+- The selected loop in `../../agentic/loop_library.md`.
+- The permission class in `../../agentic/permission_model.md`.
+- The completed work packet from `../../agentic/work_packet_template.md`.
+- Any skill or eval promotion candidate in `../../agentic/skill_registry.md` or `../../agentic/eval_registry.md`.
