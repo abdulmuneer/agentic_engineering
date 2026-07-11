@@ -11,7 +11,7 @@
 | Authoritative source | project-plan-v4.md |
 | Source version | 4 |
 | Framework version | 0.1.0 |
-| Framework catalog lock | 43a7f01107352140… |
+| Framework catalog lock | 40a8e7e554f139a6… |
 | Tailoring | confirmed |
 
 The manifest and records under `the project-instance root` are authoritative. Generated views are disposable.

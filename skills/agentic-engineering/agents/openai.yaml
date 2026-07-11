@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentic Engineering"
+  short_description: "Bootstrap and operate governed agent workflows"
+  default_prompt: "Use $agentic-engineering to bootstrap and operate this product repository with governed agents, evidence, and validation."

@@ -92,6 +92,8 @@ framework.
 ## Start Here
 
 - [Template README](agentic_engineering/README.md) explains the full structure.
+- [Codex skill](skills/agentic-engineering/SKILL.md) orchestrates bootstrap,
+  operation, audit, and governed upgrades through the executable kernel.
 - [Adoption guide](agentic_engineering/guides/adoption.md) explains tailoring and migration.
 - [Fornax example](agentic_engineering/examples/fornax/README.md) demonstrates domain-specific roles, evidence, and drift rejection.
 - [Operating process](agentic_engineering/AGENTS_template.md) describes the end-to-end workflow.
@@ -190,6 +192,8 @@ This is not tied to a specific vendor, assistant, IDE, or orchestration tool. Th
 ├── README.md
 ├── pyproject.toml
 ├── tests/
+├── skills/
+│   └── agentic-engineering/
 └── agentic_engineering/
     ├── catalog/
     ├── schemas/v1/

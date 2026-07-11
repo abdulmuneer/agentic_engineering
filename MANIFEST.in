@@ -3,3 +3,4 @@ recursive-include agentic_engineering/schemas *.json
 recursive-include agentic_engineering/presets *.yaml
 recursive-include agentic_engineering/templates *.md *.yaml
 recursive-include agentic_engineering/team *.md
+recursive-include skills *.md *.yaml

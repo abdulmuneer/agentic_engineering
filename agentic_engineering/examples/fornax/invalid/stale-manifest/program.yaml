@@ -11,9 +11,9 @@ program:
   current_gate: G2
   framework_lock:
     version: 0.1.0
-    catalog_sha256: 43a7f01107352140cf16ec3f53421d7d97b580b392a2d7e74336d52eaec48d48
+    catalog_sha256: 40a8e7e554f139a6e1d07977f866dd453f0d5fbf7b1a99c0fd034884c2ed7f17
     schemas_sha256: 57009b205d51f1ec8d6f8213bc348849c5d946000d166730c8dc0ffcc90accad
-    behavior_sha256: 54c46f76bc522a46085647b6e346ad451238b4c7a41511d2d0081350d0326823
+    behavior_sha256: 46771f6a35d523ddfd094572b64c3171762718f36f26db438ee2efe86ed9fdee
   source_of_truth:
     path: project-plan-v4.md
     declared_version: "3"
