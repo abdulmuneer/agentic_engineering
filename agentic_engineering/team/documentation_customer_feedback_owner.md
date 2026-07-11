@@ -1,3 +1,16 @@
+---
+id: documentation-customer-feedback-owner
+provides:
+  - documentation_feedback
+activation_triggers:
+  - user-facing-behavior-change
+  - release-documentation-or-communication
+  - customer-feedback-or-support-theme
+  - known-issue-or-workaround
+independent_when_risk_at_least: high
+permission_ceiling: external_write
+---
+
 # Documentation & Customer Feedback Owner
 
 ## Purpose

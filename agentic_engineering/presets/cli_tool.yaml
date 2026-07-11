@@ -1,0 +1,41 @@
+schema_version: 1
+framework_version: 0.1.0
+preset:
+  id: cli_tool
+  name: Command-line tool
+  description: A local or remotely connected command-line product with an operator-focused experience.
+  profile_defaults:
+    product_type: cli_tool
+    surfaces: [cli]
+    deployment_targets: [local]
+    data_classes: [local_user_data]
+    risk_domains: [data_loss, compatibility, supply_chain]
+  capability_defaults:
+    active:
+      - product_outcomes
+      - product_discovery
+      - requirements
+      - experience_design
+      - architecture
+      - backend_delivery
+      - code_quality
+      - verification
+      - security_privacy
+      - operability_release
+      - documentation_feedback
+    conditional: [frontend_delivery, integration_delivery, incident_response, research_assurance, regulatory_assurance]
+  workflow_defaults:
+    new_capability: discovery
+    implementation: feature
+    defect: bug_fix
+    technical_unknown: research_spike
+    distribution: release
+  risk_defaults:
+    baseline: low
+    destructive_local_action_minimum: high
+    signed_distribution_minimum: medium
+  required_tailoring_questions:
+    - Can commands delete, overwrite, migrate, or publish user data?
+    - Does the tool authenticate to remote systems or store credentials?
+    - Which operating systems, shells, and upgrade paths are supported?
+    - Is there a graphical or browser extension surface requiring frontend delivery?

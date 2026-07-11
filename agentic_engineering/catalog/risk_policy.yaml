@@ -1,0 +1,71 @@
+schema_version: 1
+framework_version: 0.1.0
+risk_policy:
+  id: core-risk-policy
+  principle: Classify from observable consequence facts; a declaration may raise but never silently lower risk.
+  tiers:
+    - id: low
+      rank: 1
+      description: Local, readily reversible work with negligible user or operational consequence.
+    - id: medium
+      rank: 2
+      description: Material but bounded work with understood recovery and limited blast radius.
+    - id: high
+      rank: 3
+      description: Sensitive, production-affecting, difficult-to-reverse, or broad-blast-radius work.
+    - id: critical
+      rank: 4
+      description: Work capable of severe customer, safety, security, legal, financial, or irreversible harm.
+  default_tier: medium
+  classification_fields:
+    - production_affecting
+    - authentication
+    - authorization
+    - sensitive_data
+    - safety_impact
+    - regulated_impact
+    - destructive_migration
+    - external_write
+    - reversibility
+    - blast_radius
+  forced_minimum_rules:
+    - id: RISK-PROD
+      minimum_tier: high
+      when_any:
+        - field: change.production_affecting
+          equals: true
+    - id: RISK-IDENTITY
+      minimum_tier: high
+      when_any:
+        - field: change.authentication
+          equals: true
+        - field: change.authorization
+          equals: true
+    - id: RISK-SENSITIVE
+      minimum_tier: high
+      when_any:
+        - field: change.sensitive_data
+          equals: true
+        - field: change.regulated_impact
+          equals: true
+    - id: RISK-DESTRUCTIVE
+      minimum_tier: high
+      when_any:
+        - field: change.destructive_migration
+          equals: true
+        - field: change.reversibility
+          in: [difficult, irreversible]
+    - id: RISK-CRITICAL-CONSEQUENCE
+      minimum_tier: critical
+      when_any:
+        - field: change.safety_impact
+          equals: severe
+        - field: change.blast_radius
+          equals: systemic
+        - field: change.reversibility
+          equals: irreversible
+  evaluation:
+    effective_tier: maximum_of_default_declared_and_matching_forced_minimum
+    unknown_fact_behavior: fail_closed
+    downgrade_requires: [waiver, accountable_human, rationale, compensating_controls, expiry]
+    critical_downgrade_allowed: false

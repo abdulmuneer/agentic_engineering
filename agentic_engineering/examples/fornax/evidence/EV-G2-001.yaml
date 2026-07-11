@@ -1,0 +1,54 @@
+schema_version: 1
+framework_version: 0.1.0
+
+evidence:
+  id: EV-G2-001
+  work_item_ref: WI-G2-001
+  packet_ref: AWP-G2-001
+  acceptance_refs:
+    - AC-G2-01
+    - AC-G2-02
+    - AC-G2-03
+  kind: integration_test
+  subject:
+    artifact_digest: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  producer:
+    actor: agent:numerical-correctness
+    run_id: independent-g2-validation-001
+    type: agent
+    context_manifest_digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
+  method:
+    command: ./fixtures/run-g2-validation --scenario two-node-reference
+    description: >-
+      Validate the runtime-integration agent's physical trace against the frozen
+      reference output, then inspect credit bounds, cancellation cleanup, and
+      stale-plan failure independently.
+    environment: physical-two-node-lab
+  result: pass
+  observed_at: "2026-07-10T11:45:00Z"
+  artifacts:
+    - uri: fixture://fornax/g2/two-node-trace.json
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    - uri: fixture://fornax/g2/numerical-comparison.json
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    - uri: fixture://fornax/g2/resource-ledger.json
+      sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+  claims_authorized:
+    - physical_two_node_protocol_correctness_for_named_fixture
+    - numerical_equivalence_for_named_fixture
+    - bounded_backpressure_and_cancellation_for_named_fixture
+  claims_forbidden:
+    - frontier_capacity
+    - production_resilience
+    - unattended_operation
+    - performance_superiority
+    - product_readiness
+  guard_authorizations:
+    - evidence_receipts_present
+    - claims_bounded_to_evidence
+    - assurance_satisfied
+  approval_ref: human:project-owner
+
+# Accepted boundary: this supports only the named two-node fixture scenario. It
+# does not establish frontier capacity, production resilience, unattended
+# operation, performance superiority, or product readiness.

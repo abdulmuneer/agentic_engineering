@@ -1,0 +1,41 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: release
+  description: Bind an exact source and artifact set to evidence, approval, deployment, and observation.
+  applies_to: [release, deployment]
+  initial_state: draft
+  terminal_states: [closed, aborted, rolled_back]
+  assurance_states: [ready, approved, deploying, deployed, verified, observed, closed]
+  states:
+    draft:
+      transitions:
+        lock_scope: {to: scope_locked, guards: [source_commit_present, work_items_linked, artifact_plan_present]}
+        abort: {to: aborted, guards: [decision_recorded]}
+    scope_locked:
+      transitions:
+        ready: {to: ready, guards: [artifacts_digest_bound, required_evidence_fresh, rollback_defined, monitoring_defined, support_ready]}
+        unlock: {to: draft, guards: [scope_change_recorded]}
+    ready:
+      transitions:
+        approve: {to: approved, guards: [assurance_satisfied, required_approvals_bound_to_subject, unresolved_risk_within_threshold]}
+        reject: {to: aborted, guards: [decision_recorded]}
+    approved:
+      transitions:
+        deploy: {to: deploying, guards: [production_permission_valid, deployment_owner_named, approval_not_expired]}
+        abort: {to: aborted, guards: [decision_recorded]}
+    deploying:
+      transitions:
+        deployed: {to: deployed, guards: [deployment_receipt_present]}
+        rollback: {to: rolled_back, guards: [rollback_receipt_present, incident_or_reason_recorded]}
+    deployed:
+      transitions:
+        verify: {to: verified, guards: [smoke_evidence_present, logs_and_alerts_checked]}
+        rollback: {to: rolled_back, guards: [rollback_receipt_present, incident_or_reason_recorded]}
+    verified:
+      transitions:
+        observe: {to: observed, guards: [monitoring_window_started, stakeholder_communication_recorded]}
+        rollback: {to: rolled_back, guards: [rollback_receipt_present, incident_or_reason_recorded]}
+    observed:
+      transitions:
+        close: {to: closed, guards: [monitoring_window_complete, anomalies_dispositioned, learnings_considered]}

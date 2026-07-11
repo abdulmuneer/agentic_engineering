@@ -1,0 +1,34 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: research_spike
+  description: Answer a bounded technical or domain question without silently becoming delivery work.
+  applies_to: [technical_unknown, domain_unknown, feasibility_question, option_analysis]
+  initial_state: draft
+  terminal_states: [accepted, stopped, cancelled]
+  assurance_states: [review, accepted]
+  states:
+    draft:
+      transitions:
+        scope: {to: scoped, guards: [question_defined, timebox_defined, allowed_outputs_defined, stop_conditions_defined]}
+        cancel: {to: cancelled, guards: [decision_recorded]}
+    scoped:
+      transitions:
+        approve: {to: approved, guards: [accountable_human_named, permissions_classified, evidence_plan_defined]}
+        revise: {to: draft, guards: [revision_rationale_recorded]}
+    approved:
+      transitions:
+        start: {to: running, guards: [permissions_satisfied]}
+        cancel: {to: cancelled, guards: [decision_recorded]}
+    running:
+      transitions:
+        synthesize: {to: synthesis, guards: [sources_recorded, evidence_receipts_present, unknowns_recorded]}
+        stop: {to: stopped, guards: [stop_reason_recorded, partial_findings_recorded]}
+    synthesis:
+      transitions:
+        request_review: {to: review, guards: [claims_bounded_to_evidence, options_and_tradeoffs_recorded]}
+        collect_more: {to: running, guards: [evidence_gap_recorded, timebox_remaining]}
+    review:
+      transitions:
+        accept: {to: accepted, guards: [assurance_satisfied, decision_or_next_step_recorded]}
+        rework: {to: scoped, guards: [review_findings_recorded]}

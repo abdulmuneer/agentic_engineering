@@ -1,0 +1,82 @@
+schema_version: 1
+framework_version: 0.1.0
+work_item:
+  id: DISC-0001
+  title: Validate the initial product hypothesis
+  type: discovery
+  workflow: discovery
+  state:
+    current: captured
+    history:
+      - sequence: 1
+        event: create
+        from: null
+        to: captured
+        at: "2026-01-01T00:00:00Z"
+        actor: human:owner
+        guard_refs: []
+        confirmed_guard_refs: []
+  source_refs: [IDEA-0001]
+  source_revision: "1"
+  objective: Decide whether to commit, narrow, kill, or park the product hypothesis.
+  accountable_human: human:owner
+  required_capabilities: [product_outcomes, product_discovery, requirements, code_quality, verification]
+  change:
+    surfaces: [discovery]
+    changed_paths: []
+    production_affecting: false
+    authentication: false
+    authorization: false
+    sensitive_data: false
+    safety_impact: none
+    regulated_impact: false
+    destructive_migration: false
+    external_write: false
+    reversibility: easy
+    blast_radius: local
+  risk:
+    declared_tier: low
+    effective_tier: low
+    assurance_level: A0
+    rule_refs: []
+  route: discovery
+  acceptance:
+    - id: AC-DISC-1
+      statement: The hypothesis receives an evidence-backed commit, narrow, kill, or park decision.
+  evidence_plan:
+    - acceptance_ref: AC-DISC-1
+      kinds: [user_research, experiment_result]
+      environment: target-user-context
+      minimum_assurance: A0
+  permission_classes: [read_only]
+  dependency_refs: []
+  decision_refs: []
+  work_packet_refs: []
+  discovery:
+    problem:
+      statement: Target users cannot reliably complete the named outcome with current alternatives.
+      evidence_refs: []
+    actor:
+      id: user:target-developer
+      description: An independent developer attempting the named outcome for the first time.
+      context: Uses the product without assistance from its implementation team.
+    hypothesis:
+      statement: A bounded product intervention will make the named outcome reliably achievable.
+      expected_outcome: At least 70 percent of target users complete the outcome within 30 minutes.
+      assumptions:
+        - The observed problem is important enough for the actor to attempt solving.
+    falsification:
+      criterion: Fewer than 70 percent of target users complete the outcome within 30 minutes.
+      metric: successful-first-attempt-rate
+      threshold: ">= 0.70"
+      evaluation_method: Observe at least five representative target users using the bounded prototype.
+    experiment:
+      id: EXP-0001
+      method: Run a time-boxed task study with representative target users and retain anonymized results.
+      owner: human:owner
+      status: planned
+      timebox: Two weeks
+      evidence_refs: []
+      unknowns: []
+    decision:
+      status: pending

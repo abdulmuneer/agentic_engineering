@@ -14,6 +14,13 @@ Use this packet whenever an agent performs or materially assists research, desig
 | Accountable Human |  |
 | Agent / Skill / Tooling Used |  |
 | Permission Class | Read-only / Local write / External read / External write / Sensitive / Production |
+| Source Revision / Digest |  |
+| Base / Result Commit |  |
+| Producer Run ID |  |
+| Assurance Level | A0 / A1 / A2 / A3 |
+| Independent Validator |  |
+| Evidence References |  |
+| Claims Authorized / Forbidden |  |
 | Status | Draft / Ready For Review / Accepted / Rejected / Needs Rework |
 
 ## Goal

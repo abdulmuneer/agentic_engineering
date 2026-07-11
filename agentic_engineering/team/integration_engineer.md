@@ -1,3 +1,16 @@
+---
+id: integration-engineer
+provides:
+  - integration_delivery
+activation_triggers:
+  - cross-system-workflow
+  - third-party-service-change
+  - webhook-queue-or-data-pipeline-change
+  - environment-handoff-risk
+independent_when_risk_at_least: high
+permission_ceiling: external_read
+---
+
 # Integration Engineer
 
 ## Purpose

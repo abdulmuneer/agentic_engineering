@@ -1,0 +1,47 @@
+schema_version: 1
+framework_version: 0.1.0
+evidence_policy:
+  id: core-evidence-policy
+  kinds:
+    - deterministic_test
+    - integration_test
+    - end_to_end_test
+    - regression_test
+    - security_test
+    - static_analysis
+    - manual_observation
+    - user_research
+    - experiment_result
+    - benchmark
+    - review
+    - approval
+    - deployment_receipt
+    - monitoring_observation
+    - document
+  required_fields:
+    - id
+    - work_item_ref
+    - kind
+    - subject
+    - producer
+    - method
+    - result
+    - observed_at
+  subject_binding:
+    code_evidence_requires_commit: true
+    artifact_evidence_requires_digest: true
+    release_evidence_requires_release_ref: true
+  freshness:
+    pull_request_evidence_commit_must_equal_head: true
+    release_evidence_commit_must_equal_release_source: true
+    changed_subject_invalidates_prior_evidence: true
+  result_values: [pass, fail, inconclusive, not_run]
+  skipped_checks:
+    represented_by_result: not_run
+    requires: [rationale, owner, risk_acceptance_ref]
+    forbidden_for_critical_required_checks: true
+  provenance:
+    preferred_capture: tool_generated_receipt
+    artifact_fields: [uri, sha256]
+    run_fields: [actor, actor_kind, run_id]
+  claim_rule: Evidence authorizes only the claim, subject, environment, and scope it actually observed.

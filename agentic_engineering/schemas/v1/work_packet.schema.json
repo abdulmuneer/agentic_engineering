@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic.engineering/schemas/v1/work_packet.schema.json",
+  "title": "Agentic Engineering Work Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "framework_version", "work_packet"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "framework_version": {"const": "0.1.0"},
+    "work_packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "work_item_ref", "date", "work_mode", "loop_type", "accountable_human", "producer", "capability_refs", "permission_classes", "status", "goal", "context", "changes_or_outputs", "verification_evidence_refs", "claims_requested", "claims_forbidden", "skipped_checks", "risks", "review_refs", "promotion_candidates"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "work_item_ref": {"$ref": "#/$defs/id"},
+        "date": {"type": "string", "format": "date"},
+        "work_mode": {"enum": ["human_led", "agent_assisted", "agent_executed_human_review"]},
+        "loop_type": {"enum": ["discovery", "requirements", "design", "implementation", "review", "test", "release", "incident", "learning", "research_spike"]},
+        "accountable_human": {"$ref": "#/$defs/id"},
+        "producer": {"$ref": "#/$defs/producer"},
+        "capability_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "permission_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/permission"}},
+        "approval_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "action_receipt_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "status": {"enum": ["draft", "ready_for_review", "accepted", "rejected", "needs_rework"]},
+        "goal": {"type": "string", "minLength": 1},
+        "context": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/contextItem"}},
+        "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "changes_or_outputs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/output"}},
+        "verification_evidence_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "claims_requested": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "claims_forbidden": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "skipped_checks": {"type": "array", "items": {"$ref": "#/$defs/skipped"}},
+        "risks": {"type": "array", "items": {"$ref": "#/$defs/risk"}},
+        "open_questions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "review_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "promotion_candidates": {"type": "array", "items": {"$ref": "#/$defs/promotion"}}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"},
+    "permission": {"enum": ["read_only", "local_write", "external_read", "external_write", "sensitive", "production"]},
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "actor_kind", "run_id"],
+      "properties": {
+        "actor": {"$ref": "#/$defs/id"},
+        "actor_kind": {"enum": ["human", "agent", "automation"]},
+        "run_id": {"type": "string", "minLength": 1},
+        "skill_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "tooling": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "context_manifest_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "contextItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {"enum": ["file", "document", "ticket", "log", "command", "source", "assumption", "other"]},
+        "ref": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref", "summary"],
+      "properties": {
+        "kind": {"enum": ["file", "commit", "artifact", "document", "decision", "finding", "other"]},
+        "ref": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "skipped": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check", "rationale", "owner", "risk_acceptance_ref"],
+      "properties": {
+        "check": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "owner": {"$ref": "#/$defs/id"},
+        "risk_acceptance_ref": {"$ref": "#/$defs/id"}
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "severity", "status", "owner"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "status": {"enum": ["open", "accepted", "mitigated", "closed"]},
+        "owner": {"$ref": "#/$defs/id"}
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary", "status"],
+      "properties": {
+        "kind": {"enum": ["test", "eval", "skill", "runbook", "template", "process", "permission_rule", "documentation"]},
+        "summary": {"type": "string", "minLength": 1},
+        "status": {"enum": ["candidate", "accepted", "rejected"]},
+        "learning_ref": {"$ref": "#/$defs/id"}
+      }
+    },
+    "digest": {"type": "string", "pattern": "^sha256:[A-Fa-f0-9]{64}$"}
+  }
+}

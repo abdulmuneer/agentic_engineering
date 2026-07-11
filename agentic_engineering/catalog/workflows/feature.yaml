@@ -1,0 +1,44 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: feature
+  description: Deliver a user, operator, or system capability through risk-adaptive gates.
+  applies_to: [feature, enhancement]
+  initial_state: draft
+  terminal_states: [closed, cancelled]
+  assurance_states: [review, verified, release_ready, released, observed, closed]
+  states:
+    draft:
+      transitions:
+        classify: {to: classified, guards: [source_ref_present, objective_defined, risk_facts_complete]}
+        cancel: {to: cancelled, guards: [decision_recorded]}
+    classified:
+      transitions:
+        ready: {to: ready, guards: [route_selected, acceptance_defined, evidence_plan_defined, capability_coverage_complete]}
+        revise: {to: draft, guards: [revision_rationale_recorded]}
+    ready:
+      transitions:
+        start: {to: in_progress, guards: [accountable_human_named, permissions_satisfied, review_capacity_available]}
+        cancel: {to: cancelled, guards: [decision_recorded]}
+    in_progress:
+      transitions:
+        request_review: {to: review, guards: [work_packet_complete, provenance_present, producer_checks_recorded]}
+        cancel: {to: cancelled, guards: [decision_recorded, partial_work_disposition_recorded]}
+    review:
+      transitions:
+        verify: {to: verified, guards: [assurance_satisfied, required_reviews_accepted, evidence_plan_satisfied]}
+        rework: {to: in_progress, guards: [review_findings_recorded]}
+    verified:
+      transitions:
+        prepare_release: {to: release_ready, guards: [release_scope_linked, rollback_defined, monitoring_defined, documentation_ready]}
+        close_without_release: {to: closed, guards: [non_release_disposition_approved]}
+    release_ready:
+      transitions:
+        release: {to: released, guards: [release_gate_passed, approvals_bound_to_subject]}
+        rework: {to: in_progress, guards: [release_blocker_recorded]}
+    released:
+      transitions:
+        observe: {to: observed, guards: [deployment_receipt_present, smoke_evidence_present]}
+    observed:
+      transitions:
+        close: {to: closed, guards: [monitoring_window_complete, residual_risks_dispositioned, learnings_considered]}

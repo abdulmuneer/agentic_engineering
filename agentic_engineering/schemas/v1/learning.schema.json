@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic.engineering/schemas/v1/learning.schema.json",
+  "title": "Agentic Engineering Learning Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "framework_version", "learning"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "framework_version": {"const": "0.1.0"},
+    "learning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "title", "source_refs", "observation", "pattern", "evidence_refs", "promotion", "owner", "status", "review_at"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "category": {"enum": ["technical", "product", "process", "incident", "agent_workflow", "security", "operability", "research"]},
+        "title": {"type": "string", "minLength": 1},
+        "source_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "observation": {"type": "string", "minLength": 1},
+        "pattern": {"type": "string", "minLength": 1},
+        "expected_future_benefit": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "promotion": {"$ref": "#/$defs/promotion"},
+        "owner": {"$ref": "#/$defs/id"},
+        "status": {"enum": ["candidate", "accepted", "implemented", "rejected", "superseded"]},
+        "review_at": {"type": "string", "format": "date-time"},
+        "supersedes_ref": {"$ref": "#/$defs/id"}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"},
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary"],
+      "properties": {
+        "kind": {"enum": ["test", "eval", "skill", "runbook", "template", "process", "permission_rule", "policy", "documentation", "none"]},
+        "summary": {"type": "string", "minLength": 1},
+        "target_ref": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,3 +1,16 @@
+---
+id: frontend-engineer
+provides:
+  - frontend_delivery
+activation_triggers:
+  - human-facing-interface-change
+  - client-state-or-routing-change
+  - accessibility-or-responsive-behavior-change
+  - frontend-api-integration
+independent_when_risk_at_least: high
+permission_ceiling: local_write
+---
+
 # Frontend Engineer
 
 ## Purpose

@@ -1,0 +1,60 @@
+schema_version: 1
+framework_version: 0.1.0
+assurance_policy:
+  id: core-assurance-policy
+  levels:
+    - id: A0
+      rank: 0
+      description: Producer self-check plus deterministic checks where available.
+      requirements:
+        distinct_run: false
+        distinct_actor: false
+        isolated_context: false
+        human_acceptance: false
+    - id: A1
+      rank: 1
+      description: A separate review run with context isolated from the producing conversation.
+      requirements:
+        distinct_run: true
+        distinct_actor: false
+        isolated_context: true
+        human_acceptance: false
+    - id: A2
+      rank: 2
+      description: A distinct producer and validator, deterministic evidence, and accountable human acceptance.
+      requirements:
+        distinct_run: true
+        distinct_actor: true
+        isolated_context: true
+        human_acceptance: true
+    - id: A3
+      rank: 3
+      description: Independent specialist human review and separate approval for consequential actions.
+      requirements:
+        distinct_run: true
+        distinct_actor: true
+        isolated_context: true
+        human_acceptance: true
+        specialist_human_review: true
+        separate_action_approver: true
+        self_approval_forbidden: true
+  minimum_by_risk:
+    low: A0
+    medium: A1
+    high: A2
+    critical: A3
+  run_receipt_required_from: A1
+  run_receipt_fields:
+    - run_id
+    - actor
+    - actor_kind
+    - context_manifest_digest
+  recommended_run_receipt_fields:
+    - parent_run_id
+    - permission_grant_refs
+    - input_refs
+    - output_refs
+  rules:
+    - A self-authored independence assertion does not satisfy A2 or A3.
+    - An unverifiable agent run may contribute evidence but cannot be the independent validator at A2 or A3.
+    - Deterministic automation can supply evidence but cannot supply accountable approval.

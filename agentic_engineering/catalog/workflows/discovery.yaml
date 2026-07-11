@@ -1,0 +1,61 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: discovery
+  description: Test a product or capability hypothesis before delivery commitment.
+  applies_to: [new_product, new_user_problem, material_scope_expansion]
+  initial_state: captured
+  terminal_states: [committed, narrowed, killed, parked]
+  assurance_states: [evidence_ready, decision_pending, committed, narrowed, killed, parked]
+  discriminator:
+    field: type
+    value: discovery
+  canonical_section: discovery
+  guard_contracts:
+    problem_defined: {path: discovery.problem.statement, predicate: non_empty}
+    target_actor_defined: {path: discovery.actor.id, predicate: non_empty}
+    hypothesis_defined: {path: discovery.hypothesis.statement, predicate: non_empty}
+    falsification_defined: {path: discovery.falsification.criterion, predicate: non_empty}
+    experiment_defined: {path: discovery.experiment.id, predicate: non_empty}
+    experiment_owner_named: {path: discovery.experiment.owner, predicate: declared_actor}
+    experiment_running: {path: discovery.experiment.status, equals: running}
+    experiment_completed: {path: discovery.experiment.status, equals: completed}
+    experiment_stopped: {path: discovery.experiment.status, equals: stopped}
+    evidence_receipts_present: {path: discovery.experiment.evidence_refs, predicate: non_empty_resolved_refs}
+    unknowns_recorded: {path: discovery.experiment.unknowns, predicate: present}
+    evidence_reviewed: {path: discovery.decision.evidence_refs, predicate: non_empty_resolved_refs}
+    decision_commit_recorded: {path: discovery.decision.disposition, equals: commit}
+    decision_narrow_recorded: {path: discovery.decision.disposition, equals: narrow}
+    decision_kill_recorded: {path: discovery.decision.disposition, equals: kill}
+    decision_park_recorded: {path: discovery.decision.disposition, equals: park}
+    outcome_measures_defined: {path: discovery.decision.outcome_measures, predicate: non_empty}
+    successor_hypothesis_ref_present: {path: discovery.decision.successor_hypothesis_ref, predicate: resolved_ref}
+    revisit_condition_present: {path: discovery.decision.revisit_when, predicate: non_empty}
+  states:
+    captured:
+      transitions:
+        screen: {to: screened, guards: [problem_defined, target_actor_defined, accountable_human_named]}
+        park: {to: parked, guards: [decision_park_recorded, revisit_condition_present]}
+    screened:
+      transitions:
+        design_experiment: {to: experiment_ready, guards: [hypothesis_defined, falsification_defined, experiment_defined, evidence_plan_defined]}
+        reject: {to: killed, guards: [decision_kill_recorded]}
+        park: {to: parked, guards: [decision_park_recorded, revisit_condition_present]}
+    experiment_ready:
+      transitions:
+        begin_experiment: {to: experimenting, guards: [permissions_satisfied, experiment_owner_named, experiment_running]}
+        revise: {to: screened, guards: [revision_rationale_recorded]}
+    experimenting:
+      transitions:
+        complete_experiment: {to: evidence_ready, guards: [experiment_completed, evidence_receipts_present, unknowns_recorded]}
+        stop: {to: decision_pending, guards: [experiment_stopped, stop_reason_recorded]}
+    evidence_ready:
+      transitions:
+        request_decision: {to: decision_pending, guards: [evidence_reviewed, falsification_evaluated]}
+        collect_more: {to: experiment_ready, guards: [evidence_gap_recorded]}
+    decision_pending:
+      transitions:
+        commit: {to: committed, guards: [decision_commit_recorded, outcome_measures_defined]}
+        narrow: {to: narrowed, guards: [decision_narrow_recorded, successor_hypothesis_ref_present]}
+        kill: {to: killed, guards: [decision_kill_recorded]}
+        park: {to: parked, guards: [decision_park_recorded, revisit_condition_present]}

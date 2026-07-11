@@ -2,6 +2,8 @@
 
 This folder contains program-level operating material. It is split into reusable trackers, general program documentation, and sprint-specific records.
 
+For new project overlays, treat these as narrative templates and reference guidance. Machine-enforceable facts and transitions belong in `.agentic/program.yaml` and `.agentic/records`; generated views replace duplicated active tracker tables.
+
 ## Structure
 
 | Folder | Purpose |

@@ -1,0 +1,46 @@
+schema_version: 1
+framework_version: 0.1.0
+preset:
+  id: regulated_service
+  name: Regulated service
+  description: A production service subject to legal, regulatory, safety, audit, or formal control obligations.
+  profile_defaults:
+    product_type: regulated_service
+    surfaces: [service, api, operator_console]
+    deployment_targets: [controlled_hosted]
+    data_classes: [regulated_data, customer_data]
+    risk_domains: [security, privacy, safety, compliance, availability, auditability]
+  capability_defaults:
+    active:
+      - product_outcomes
+      - product_discovery
+      - requirements
+      - experience_design
+      - architecture
+      - backend_delivery
+      - frontend_delivery
+      - integration_delivery
+      - code_quality
+      - verification
+      - security_privacy
+      - operability_release
+      - documentation_feedback
+      - incident_response
+      - regulatory_assurance
+    conditional: [research_assurance]
+  workflow_defaults:
+    new_capability: discovery
+    implementation: feature
+    defect: bug_fix
+    incident: incident
+    deployment: release
+  risk_defaults:
+    baseline: high
+    safety_or_irreversible_consequence_minimum: critical
+    production_release_minimum: high
+    minimum_release_assurance: A3
+  required_tailoring_questions:
+    - Which regulations, control families, retention rules, and accountable signatories apply?
+    - What constitutes a safety, privacy, or reportable incident?
+    - Which duties must be separated and which actions require two-person approval?
+    - What evidence must be immutable, signed, retained, or independently audited?

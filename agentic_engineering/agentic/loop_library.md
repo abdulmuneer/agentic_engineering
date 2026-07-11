@@ -2,6 +2,8 @@
 
 Use this library to choose the right bounded loop before starting agent work.
 
+This document explains the loops. The machine-readable state transitions and guards live in `../catalog/workflows`; an initialized project's routed work item selects the applicable workflow.
+
 ## Loop Rules
 
 - Every loop has an accountable human.
@@ -186,6 +188,32 @@ Stop conditions:
 - High-risk work packet is incomplete.
 - Rollback is unclear.
 - Monitoring or support readiness is missing.
+
+## Incident Loop
+
+Use when a service, security, data, safety, or operational event requires containment and recovery.
+
+Allowed outputs:
+
+- Impact and incident record.
+- Containment or mitigation receipts.
+- Recovery verification.
+- Stakeholder communication.
+- Postmortem and corrective actions.
+
+Evidence required:
+
+- Current impact and incident authority.
+- Actions taken, actor, time, and affected subject.
+- Recovery and monitoring evidence.
+- Residual risk and follow-up ownership.
+
+Stop conditions:
+
+- Emergency authority is unclear.
+- The proposed action expands blast radius or permission class without approval.
+- Recovery cannot be verified.
+- A security, privacy, legal, or safety escalation requires a specialist human.
 
 ## Learning Promotion Loop
 

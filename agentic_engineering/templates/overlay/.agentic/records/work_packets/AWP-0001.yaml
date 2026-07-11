@@ -1,0 +1,37 @@
+schema_version: 1
+framework_version: 0.1.0
+work_packet:
+  id: AWP-0001
+  work_item_ref: WORK-0001
+  date: "2026-01-01"
+  work_mode: agent_executed_human_review
+  loop_type: implementation
+  accountable_human: human:owner
+  producer:
+    actor: agent:implementation
+    actor_kind: agent
+    run_id: RUN-0001
+    skill_refs: []
+    tooling: [editor, test_runner]
+  capability_refs: [requirements]
+  permission_classes: [local_write]
+  approval_refs: []
+  action_receipt_refs: []
+  status: draft
+  goal: Implement WORK-0001 without expanding its approved scope.
+  context:
+    - kind: file
+      ref: .agentic/records/work_items/WORK-0001.yaml
+  assumptions: []
+  changes_or_outputs:
+    - kind: file
+      ref: src/example.py
+      summary: Sample implementation output; replace with the real changed artifact.
+  verification_evidence_refs: [EV-0001]
+  claims_requested: [acceptance:AC-1]
+  claims_forbidden: [production_ready]
+  skipped_checks: []
+  risks: []
+  open_questions: []
+  review_refs: []
+  promotion_candidates: []

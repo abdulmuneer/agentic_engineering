@@ -1,3 +1,16 @@
+---
+id: backend-engineer
+provides:
+  - backend_delivery
+activation_triggers:
+  - backend-service-change
+  - api-contract-change
+  - data-model-or-migration
+  - server-side-auth-or-authorization-change
+independent_when_risk_at_least: high
+permission_ceiling: local_write
+---
+
 # Backend Engineer
 
 ## Purpose

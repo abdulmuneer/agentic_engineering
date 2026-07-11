@@ -1,3 +1,17 @@
+---
+id: security-reviewer
+provides:
+  - security_privacy
+  - regulatory_assurance
+activation_triggers:
+  - authentication-or-authorization-change
+  - sensitive-data-or-privacy-impact
+  - external-dependency-or-integration-risk
+  - security-or-compliance-concern
+independent_when_risk_at_least: medium
+permission_ceiling: sensitive
+---
+
 # Security Reviewer
 
 ## Purpose

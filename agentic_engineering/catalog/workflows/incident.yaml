@@ -1,0 +1,34 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: incident
+  description: Restore safety and service first, then establish causes and durable corrective actions.
+  applies_to: [incident, outage, security_event, data_event]
+  initial_state: detected
+  terminal_states: [closed, false_alarm]
+  assurance_states: [recovered, postmortem, actions_tracked, closed]
+  states:
+    detected:
+      transitions:
+        triage: {to: triaged, guards: [incident_commander_named, impact_recorded, communication_channel_defined]}
+        dismiss: {to: false_alarm, guards: [evidence_recorded, decision_recorded]}
+    triaged:
+      transitions:
+        contain: {to: contained, guards: [containment_action_receipts_present, current_impact_recorded]}
+        mitigate: {to: mitigating, guards: [mitigation_plan_recorded, emergency_permissions_recorded]}
+    contained:
+      transitions:
+        mitigate: {to: mitigating, guards: [mitigation_plan_recorded, emergency_permissions_recorded]}
+    mitigating:
+      transitions:
+        recover: {to: recovered, guards: [recovery_evidence_present, service_owner_acceptance_present]}
+        recontain: {to: contained, guards: [regression_evidence_present]}
+    recovered:
+      transitions:
+        begin_postmortem: {to: postmortem, guards: [monitoring_stable, incident_timeline_present, customer_impact_recorded]}
+    postmortem:
+      transitions:
+        track_actions: {to: actions_tracked, guards: [causal_analysis_reviewed, corrective_actions_owned, learnings_recorded]}
+    actions_tracked:
+      transitions:
+        close: {to: closed, guards: [required_actions_linked, communication_complete, accountable_human_approval]}

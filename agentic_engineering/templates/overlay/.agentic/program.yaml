@@ -1,0 +1,90 @@
+schema_version: 1
+framework_version: 0.1.0
+program:
+  id: example-program
+  name: Example Program
+  description: Replace this sample with the product-specific operating model.
+  framework_preset: cli_tool
+  accountable_human: human:owner
+  source_roots:
+    - .
+  governance_root: .agentic
+  current_gate: G0
+  framework_lock:
+    version: 0.1.0
+    catalog_sha256: 43a7f01107352140cf16ec3f53421d7d97b580b392a2d7e74336d52eaec48d48
+    schemas_sha256: 57009b205d51f1ec8d6f8213bc348849c5d946000d166730c8dc0ffcc90accad
+    behavior_sha256: 54c46f76bc522a46085647b6e346ad451238b4c7a41511d2d0081350d0326823
+  source_of_truth:
+    path: docs/program-plan.md
+    declared_version: "1"
+    sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  profile:
+    product_type: cli_tool
+    lifecycle_phase: discovery
+    surfaces: [cli]
+    deployment_targets: [local]
+    data_classes: [local_user_data]
+    risk_domains: [compatibility, data_loss]
+  capabilities:
+    - id: product_outcomes
+      disposition: active
+      owner: human:owner
+      executors: [agent:product]
+      reviewers: [human:owner]
+    - id: requirements
+      disposition: active
+      owner: human:owner
+      executors: [agent:implementation]
+      reviewers: [human:owner]
+    - id: code_quality
+      disposition: active
+      owner: human:owner
+      executors: [agent:review]
+      reviewers: [human:owner]
+    - id: verification
+      disposition: active
+      owner: human:owner
+      executors: [agent:review]
+      reviewers: [human:owner]
+    - id: frontend_delivery
+      disposition: not_applicable
+      rationale: The current product has no graphical interface.
+      reconsider_when: [graphical_surface_added]
+  actors:
+    - id: human:owner
+      kind: human
+      name: Accountable owner
+      capabilities: [product_outcomes, requirements, code_quality, verification]
+      permission_ceiling: production
+    - id: agent:product
+      kind: agent
+      name: Product discovery agent
+      capabilities: [product_outcomes]
+      permission_ceiling: read_only
+    - id: agent:implementation
+      kind: agent
+      name: Implementation agent
+      capabilities: [requirements]
+      permission_ceiling: local_write
+    - id: agent:review
+      kind: agent
+      name: Independent review agent
+      capabilities: [code_quality, verification]
+      permission_ceiling: read_only
+  workflow_defaults:
+    new_capability: discovery
+    implementation: feature
+    defect: bug_fix
+    deployment: release
+  risk_defaults:
+    baseline: low
+  tailoring:
+    status: pending
+    questions:
+      - Which project-specific risks, capabilities, actors, and permissions apply?
+  policy_refs:
+    - core-risk-policy
+    - core-assurance-policy
+    - core-permission-policy
+    - core-evidence-policy

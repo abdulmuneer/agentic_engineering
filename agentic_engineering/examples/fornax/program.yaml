@@ -1,0 +1,254 @@
+schema_version: 1
+framework_version: 0.1.0
+
+program:
+  id: fornax-example
+  name: Fornax Example
+  accountable_human: human:project-owner
+  source_roots:
+    - .
+  governance_root: .
+  current_gate: G2
+  framework_lock:
+    version: 0.1.0
+    catalog_sha256: 43a7f01107352140cf16ec3f53421d7d97b580b392a2d7e74336d52eaec48d48
+    schemas_sha256: 57009b205d51f1ec8d6f8213bc348849c5d946000d166730c8dc0ffcc90accad
+    behavior_sha256: 54c46f76bc522a46085647b6e346ad451238b4c7a41511d2d0081350d0326823
+  source_of_truth:
+    path: project-plan-v4.md
+    declared_version: "4"
+    sha256: fd25e0d2baf5002d00c7a7ce76eebc566b26e49e0fb5069b28ff6a34e3d299fc
+
+  profile:
+    product_type: research-system
+    lifecycle_phase: validation
+    surfaces:
+      - stage-protocol
+      - operator-cli
+    deployment_targets:
+      - physical-lab
+    data_classes:
+      - synthetic-model-fixture
+    risk_domains:
+      - distributed-correctness
+      - network-security
+      - capability-claim-integrity
+
+  capabilities:
+    - id: product_outcomes
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:program-manager
+      reviewers:
+        - human:technical-lead
+
+    - id: product_discovery
+      disposition: not_applicable
+      rationale: The bounded validation thesis is already authorized for this phase.
+      reconsider_when:
+        - A new user problem or material scope expansion is proposed.
+
+    - id: requirements
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:program-manager
+      reviewers:
+        - human:technical-lead
+
+    - id: experience_design
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:program-manager
+      reviewers:
+        - human:technical-lead
+
+    - id: architecture
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:distributed-systems
+      reviewers:
+        - agent:runtime-integration
+
+    - id: backend_delivery
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:runtime-integration
+      reviewers:
+        - agent:numerical-correctness
+
+    - id: frontend_delivery
+      disposition: not_applicable
+      rationale: No graphical user surface is in the approved product scope.
+      reconsider_when:
+        - A graphical user surface enters an approved plan.
+
+    - id: integration_delivery
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:runtime-integration
+        - agent:distributed-systems
+      reviewers:
+        - agent:network-security
+
+    - id: code_quality
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:numerical-correctness
+      reviewers:
+        - human:technical-lead
+
+    - id: verification
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:numerical-correctness
+      reviewers:
+        - human:project-owner
+
+    - id: security_privacy
+      disposition: active
+      owner: human:technical-lead
+      executors:
+        - agent:network-security
+      reviewers:
+        - human:technical-lead
+
+    - id: operability_release
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:evidence-custodian
+      reviewers:
+        - agent:network-security
+
+    - id: documentation_feedback
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:program-manager
+      reviewers:
+        - human:technical-lead
+
+    - id: incident_response
+      disposition: not_applicable
+      rationale: The fixture has no production service or customer incident surface.
+      reconsider_when:
+        - A persistent shared or production deployment is authorized.
+
+    - id: research_assurance
+      disposition: active
+      owner: human:project-owner
+      executors:
+        - agent:evidence-custodian
+        - agent:numerical-correctness
+      reviewers:
+        - human:technical-lead
+
+    - id: regulatory_assurance
+      disposition: not_applicable
+      rationale: The fixture uses synthetic data and has no regulatory commitment.
+      reconsider_when:
+        - Regulated data or a compliance commitment enters scope.
+
+  actors:
+    - id: human:project-owner
+      kind: human
+      capabilities:
+        - product_outcomes
+        - requirements
+        - experience_design
+        - operability_release
+        - documentation_feedback
+        - research_assurance
+        - verification
+      permission_ceiling: production
+
+    - id: human:technical-lead
+      kind: human
+      capabilities:
+        - product_outcomes
+        - requirements
+        - experience_design
+        - architecture
+        - backend_delivery
+        - integration_delivery
+        - code_quality
+        - verification
+        - security_privacy
+        - documentation_feedback
+        - research_assurance
+      permission_ceiling: sensitive
+
+    - id: agent:program-manager
+      kind: agent
+      capabilities:
+        - product_outcomes
+        - requirements
+        - experience_design
+        - documentation_feedback
+      permission_ceiling: local_write
+
+    - id: agent:runtime-integration
+      kind: agent
+      capabilities:
+        - architecture
+        - backend_delivery
+        - integration_delivery
+      permission_ceiling: external_write
+
+    - id: agent:distributed-systems
+      kind: agent
+      capabilities:
+        - architecture
+        - integration_delivery
+      permission_ceiling: external_write
+
+    - id: agent:numerical-correctness
+      kind: agent
+      capabilities:
+        - backend_delivery
+        - code_quality
+        - verification
+        - research_assurance
+      permission_ceiling: external_read
+
+    - id: agent:network-security
+      kind: agent
+      capabilities:
+        - integration_delivery
+        - security_privacy
+        - operability_release
+      permission_ceiling: sensitive
+
+    - id: agent:evidence-custodian
+      kind: agent
+      capabilities:
+        - operability_release
+        - research_assurance
+      permission_ceiling: local_write
+
+  risk_defaults:
+    baseline: medium
+
+  tailoring:
+    status: confirmed
+    questions:
+      - Which physical environments and frozen fixtures establish reproducibility?
+      - Which claims are authorized by G2 evidence and which remain forbidden?
+      - Which external lab writes require explicit human authorization?
+    answers:
+      - question: Which physical environments and frozen fixtures establish reproducibility?
+        answer: The named physical-two-node-lab environment and frozen G2 reference fixture.
+      - question: Which claims are authorized by G2 evidence and which remain forbidden?
+        answer: Only the three named-fixture claims are authorized; frontier, resilience, unattended, performance, and readiness claims remain forbidden.
+      - question: Which external lab writes require explicit human authorization?
+        answer: Every physical-lab execution that writes fixture traces requires a subject- and actor-bound decision plus an action receipt.
+    confirmed_by: human:project-owner
+    confirmed_at: "2026-07-10T09:45:00Z"

@@ -1,0 +1,29 @@
+schema_version: 1
+framework_version: 0.1.0
+
+decision:
+  id: DEC-G2-PERMISSION
+  type: delivery
+  title: Authorize the bounded G2 physical-lab write
+  subject_refs: [WI-G2-001]
+  options:
+    - id: authorize-bounded-run
+      summary: Authorize only the named two-node fixture in the physical lab.
+      tradeoffs: [Consumes a reserved lab window, Produces an externally written trace]
+    - id: keep-local
+      summary: Do not execute the physical fixture.
+      tradeoffs: [Cannot establish the physical-fixture claim]
+  outcome:
+    disposition: approve
+    selected_option_ref: authorize-bounded-run
+  rationale: The scope, actors, lab target, claim boundary, and rollback are explicit.
+  owner: human:project-owner
+  reviewers: [human:technical-lead]
+  evidence_refs: []
+  guard_authorizations: [permissions_satisfied]
+  decided_at: "2026-07-10T10:05:00Z"
+  authorization:
+    permission_classes: [external_write]
+    actor_refs: [agent:runtime-integration]
+    action_scope: Run the named G2 two-node fixture and write only its trace artifacts.
+    expires_at: "2099-07-10T10:05:00Z"

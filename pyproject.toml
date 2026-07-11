@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=67.8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-engineering"
+version = "0.1.0"
+description = "A risk-adaptive operating-model compiler for disciplined agentic engineering"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["PyYAML>=6.0", "jsonschema>=4.20"]
+
+[project.scripts]
+agentic = "agentic_engineering.runtime.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["agentic_engineering*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+agentic_engineering = [
+  "catalog/*.yaml",
+  "catalog/workflows/*.yaml",
+  "schemas/v1/*.json",
+  "presets/*.yaml",
+  "templates/overlay/*.md",
+  "templates/overlay/*.yaml",
+  "templates/overlay/.agentic/*.yaml",
+  "templates/overlay/.agentic/records/**/*.yaml",
+  "team/*.md",
+]

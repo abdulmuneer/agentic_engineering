@@ -1,3 +1,16 @@
+---
+id: requirements-analyst
+provides:
+  - requirements
+activation_triggers:
+  - new-or-changed-requirement
+  - unclear-acceptance-criteria
+  - business-rule-or-edge-case-change
+  - scope-change
+independent_when_risk_at_least: medium
+permission_ceiling: local_write
+---
+
 # Requirements Analyst
 
 ## Purpose

@@ -1,3 +1,16 @@
+---
+id: solution-architect
+provides:
+  - architecture
+activation_triggers:
+  - new-system-or-major-feature
+  - architecture-boundary-change
+  - data-model-or-api-contract-change
+  - non-functional-risk
+independent_when_risk_at_least: high
+permission_ceiling: local_write
+---
+
 # Solution Architect
 
 ## Purpose

@@ -1,0 +1,18 @@
+schema_version: 1
+framework_version: 0.1.0
+learning:
+  id: LEARN-0001
+  category: process
+  title: Replace this sample with an observed reusable learning
+  source_refs: [WORK-0001, AWP-0001]
+  observation: A concrete behavior was observed during execution or review.
+  pattern: State whether the behavior repeated or represents a high-impact event.
+  expected_future_benefit: Prevent recurrence or reduce the cost of future verified work.
+  evidence_refs: [EV-0001]
+  promotion:
+    kind: test
+    summary: Promote the observed behavior into a durable regression check.
+    target_ref: tests/test_example.py
+  owner: human:owner
+  status: candidate
+  review_at: "2026-02-01T00:00:00Z"

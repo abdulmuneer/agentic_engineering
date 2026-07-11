@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic.engineering/schemas/v1/decision.schema.json",
+  "title": "Agentic Engineering Decision Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "framework_version", "decision"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "framework_version": {"const": "0.1.0"},
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "subject_refs", "options", "outcome", "rationale", "owner", "reviewers", "evidence_refs", "decided_at"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"enum": ["discovery", "product", "requirements", "experience", "architecture", "security", "delivery", "release", "risk_acceptance", "incident", "learning"]},
+        "title": {"type": "string", "minLength": 1},
+        "subject_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "options": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/option"}},
+        "outcome": {"$ref": "#/$defs/outcome"},
+        "rationale": {"type": "string", "minLength": 1},
+        "owner": {"$ref": "#/$defs/id"},
+        "reviewers": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "guard_authorizations": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "revisit_at": {"type": "string", "format": "date-time"},
+        "revisit_when": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "authorization": {"$ref": "#/$defs/authorization"},
+        "source_update": {"$ref": "#/$defs/sourceUpdate"},
+        "risk_acceptance": {"$ref": "#/$defs/riskAcceptance"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "risk_acceptance"}}, "required": ["type"]},
+          "then": {"required": ["risk_acceptance"]}
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"},
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "summary": {"type": "string", "minLength": 1},
+        "tradeoffs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposition"],
+      "properties": {
+        "disposition": {"enum": ["commit", "narrow", "kill", "park", "approve", "reject", "go", "no_go", "accept_risk", "mitigate", "custom"]},
+        "selected_option_ref": {"$ref": "#/$defs/id"},
+        "successor_ref": {"$ref": "#/$defs/id"},
+        "custom_value": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"disposition": {"const": "narrow"}}, "required": ["disposition"]}, "then": {"required": ["successor_ref"]}},
+        {"if": {"properties": {"disposition": {"const": "custom"}}, "required": ["disposition"]}, "then": {"required": ["custom_value"]}}
+      ]
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["permission_classes", "actor_refs", "action_scope", "expires_at"],
+      "properties": {
+        "permission_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["read_only", "local_write", "external_read", "external_write", "sensitive", "production"]}},
+        "actor_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "action_scope": {"type": "string", "minLength": 1},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "sourceUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "declared_version", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "declared_version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"}
+      }
+    },
+    "riskAcceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_tier", "to_tier", "expires_at", "compensating_controls"],
+      "properties": {
+        "from_tier": {"enum": ["low", "medium", "high", "critical"]},
+        "to_tier": {"enum": ["low", "medium", "high", "critical"]},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "compensating_controls": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

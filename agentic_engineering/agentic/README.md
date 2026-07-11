@@ -2,6 +2,8 @@
 
 This folder turns the package from a classical delivery scaffold into an agentic operating system.
 
+The prose here explains the controls. Their executable definitions live in `../catalog`, their schemas in `../schemas/v1`, and project-specific state in an initialized product's `.agentic/` overlay.
+
 Use these files when humans delegate work to agents, use MCP tools, run subagents, or convert repeated work into reusable skills and evals.
 
 ## Files

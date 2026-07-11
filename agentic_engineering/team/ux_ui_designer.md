@@ -1,3 +1,16 @@
+---
+id: ux-ui-designer
+provides:
+  - experience_design
+activation_triggers:
+  - human-facing-workflow-change
+  - new-or-changed-interface
+  - accessibility-impact
+  - usability-risk
+independent_when_risk_at_least: medium
+permission_ceiling: local_write
+---
+
 # UX/UI Designer
 
 ## Purpose

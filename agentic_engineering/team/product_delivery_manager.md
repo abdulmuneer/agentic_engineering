@@ -1,3 +1,17 @@
+---
+id: product-delivery-manager
+provides:
+  - product_outcomes
+  - product_discovery
+activation_triggers:
+  - new-product-or-major-bet
+  - priority-or-scope-change
+  - success-metric-change
+  - release-go-no-go
+independent_when_risk_at_least: high
+permission_ceiling: local_write
+---
+
 # Product & Delivery Manager
 
 ## Purpose

@@ -1,0 +1,113 @@
+schema_version: 1
+framework_version: 0.1.0
+catalog:
+  id: core-capabilities
+  description: Project capabilities are concerns to cover, not mandatory people or agents.
+  disposition_values:
+    - active
+    - not_applicable
+    - waived
+  disposition_rules:
+    active:
+      requires: [owner]
+    not_applicable:
+      requires: [rationale, reconsider_when]
+    waived:
+      requires: [rationale, waiver.owner, waiver.expires_at, waiver.compensating_controls]
+  capabilities:
+    - id: product_outcomes
+      name: Product outcomes
+      purpose: Own the problem, value hypothesis, priorities, and outcome measures.
+      default: required
+      activation_triggers: [always]
+      expected_outputs: [outcome_definition, success_metrics, priority_decisions]
+    - id: product_discovery
+      name: Product discovery
+      purpose: Test assumptions before committing significant delivery capacity.
+      default: conditional
+      activation_triggers: [new_product, new_user_problem, material_scope_expansion]
+      expected_outputs: [hypothesis, experiment, discovery_decision]
+    - id: requirements
+      name: Requirements and acceptance
+      purpose: Turn approved outcomes into observable requirements and acceptance evidence.
+      default: required
+      activation_triggers: [delivery_work]
+      expected_outputs: [requirements, acceptance_criteria, traceability]
+    - id: experience_design
+      name: User and operator experience
+      purpose: Make human-facing flows usable, accessible, and operationally clear.
+      default: conditional
+      activation_triggers: [human_facing_surface, operator_workflow_change]
+      expected_outputs: [flows, interaction_states, accessibility_review]
+    - id: architecture
+      name: Architecture
+      purpose: Govern boundaries, data, interfaces, constraints, and consequential technical choices.
+      default: conditional
+      activation_triggers: [new_component, interface_change, data_model_change, infrastructure_change]
+      expected_outputs: [architecture_notes, tradeoffs, decision_records]
+    - id: backend_delivery
+      name: Backend delivery
+      purpose: Implement services, domain logic, storage, and server-side behavior.
+      default: conditional
+      activation_triggers: [backend_surface]
+      expected_outputs: [implementation, automated_tests, developer_notes]
+    - id: frontend_delivery
+      name: Frontend delivery
+      purpose: Implement browser, desktop, mobile, or other graphical product surfaces.
+      default: conditional
+      activation_triggers: [graphical_surface]
+      expected_outputs: [implementation, component_tests, accessibility_evidence]
+    - id: integration_delivery
+      name: Integration delivery
+      purpose: Implement and verify boundaries with external systems and internal components.
+      default: conditional
+      activation_triggers: [external_integration, protocol_change, cross_component_change]
+      expected_outputs: [contracts, integration_tests, failure_handling]
+    - id: code_quality
+      name: Code quality
+      purpose: Independently inspect correctness, maintainability, and architectural fit.
+      default: required
+      activation_triggers: [code_change]
+      expected_outputs: [review_findings, review_decision]
+    - id: verification
+      name: Verification and test
+      purpose: Demonstrate acceptance criteria and regression behavior with appropriate evidence.
+      default: required
+      activation_triggers: [delivery_work]
+      expected_outputs: [test_plan, evidence_receipts, quality_decision]
+    - id: security_privacy
+      name: Security and privacy
+      purpose: Identify and control abuse, confidentiality, integrity, privacy, and authorization risks.
+      default: conditional
+      activation_triggers: [authentication_change, authorization_change, sensitive_data, external_exposure, dependency_change]
+      expected_outputs: [threat_review, security_findings, security_decision]
+    - id: operability_release
+      name: Operability and release
+      purpose: Make changes deployable, observable, supportable, reversible, and recoverable.
+      default: conditional
+      activation_triggers: [runtime_change, production_release, infrastructure_change]
+      expected_outputs: [release_plan, rollback_plan, monitoring_evidence]
+    - id: documentation_feedback
+      name: Documentation and feedback
+      purpose: Keep users and operators informed and feed observed behavior back into the program.
+      default: conditional
+      activation_triggers: [user_visible_change, operator_change, release]
+      expected_outputs: [documentation, release_notes, feedback_records]
+    - id: incident_response
+      name: Incident response
+      purpose: Coordinate containment, recovery, communication, and durable corrective action.
+      default: conditional
+      activation_triggers: [incident]
+      expected_outputs: [incident_record, recovery_evidence, postmortem]
+    - id: research_assurance
+      name: Research assurance
+      purpose: Preserve experimental validity, reproducibility, provenance, and claim boundaries.
+      default: conditional
+      activation_triggers: [research_claim, benchmark, model_or_algorithm_change]
+      expected_outputs: [protocol, reproducible_results, claim_review]
+    - id: regulatory_assurance
+      name: Regulatory assurance
+      purpose: Maintain required controls, records, traceability, and accountable sign-off.
+      default: conditional
+      activation_triggers: [regulated_domain, compliance_commitment]
+      expected_outputs: [control_evidence, compliance_review, accountable_approval]

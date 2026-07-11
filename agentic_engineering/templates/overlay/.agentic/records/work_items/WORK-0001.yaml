@@ -1,0 +1,54 @@
+schema_version: 1
+framework_version: 0.1.0
+work_item:
+  id: WORK-0001
+  title: Replace this sample work item
+  type: feature
+  workflow: feature
+  state:
+    current: draft
+    history:
+      - sequence: 1
+        event: create
+        from: null
+        to: draft
+        at: "2026-01-01T00:00:00Z"
+        actor: human:owner
+        guard_refs: []
+        confirmed_guard_refs: []
+  source_refs: [DEC-0001]
+  source_revision: "1"
+  objective: Produce the observable outcome described by AC-1.
+  accountable_human: human:owner
+  required_capabilities: [requirements, code_quality, verification]
+  change:
+    surfaces: [cli]
+    changed_paths: [src/example.py]
+    production_affecting: false
+    authentication: false
+    authorization: false
+    sensitive_data: false
+    safety_impact: none
+    regulated_impact: false
+    destructive_migration: false
+    external_write: false
+    reversibility: easy
+    blast_radius: local
+  risk:
+    declared_tier: low
+    effective_tier: low
+    assurance_level: A0
+    rule_refs: []
+  route: feature
+  acceptance:
+    - id: AC-1
+      statement: The new behavior is observable and its regression check passes.
+  evidence_plan:
+    - acceptance_ref: AC-1
+      kinds: [deterministic_test]
+      environment: local
+      minimum_assurance: A0
+  permission_classes: [local_write]
+  dependency_refs: []
+  decision_refs: [DEC-0001]
+  work_packet_refs: [AWP-0001]

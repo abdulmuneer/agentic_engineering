@@ -1,0 +1,46 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: bug_fix
+  description: Reproduce, correct, and prevent recurrence of a defect.
+  applies_to: [bug, defect, regression]
+  initial_state: reported
+  terminal_states: [closed, not_reproducible, wont_fix, cancelled]
+  assurance_states: [review, verified, release_ready, released, observed, closed]
+  states:
+    reported:
+      transitions:
+        triage: {to: triaged, guards: [symptom_recorded, impact_recorded, accountable_human_named]}
+        cancel: {to: cancelled, guards: [decision_recorded]}
+    triaged:
+      transitions:
+        reproduce: {to: reproduced, guards: [reproduction_evidence_present, risk_facts_complete]}
+        cannot_reproduce: {to: not_reproducible, guards: [attempts_recorded, evidence_gap_recorded, decision_recorded]}
+        decline: {to: wont_fix, guards: [impact_accepted, decision_recorded]}
+    reproduced:
+      transitions:
+        ready: {to: ready, guards: [root_cause_or_bounded_hypothesis_present, acceptance_defined, regression_plan_defined, capability_coverage_complete]}
+    ready:
+      transitions:
+        start: {to: in_progress, guards: [permissions_satisfied, review_capacity_available]}
+    in_progress:
+      transitions:
+        request_review: {to: review, guards: [work_packet_complete, regression_evidence_present, provenance_present]}
+    review:
+      transitions:
+        verify: {to: verified, guards: [assurance_satisfied, required_reviews_accepted, evidence_plan_satisfied]}
+        rework: {to: in_progress, guards: [review_findings_recorded]}
+    verified:
+      transitions:
+        prepare_release: {to: release_ready, guards: [release_scope_linked, rollback_defined, monitoring_defined]}
+        close: {to: closed, guards: [non_release_disposition_approved]}
+    release_ready:
+      transitions:
+        release: {to: released, guards: [release_gate_passed, approvals_bound_to_subject]}
+        rework: {to: in_progress, guards: [release_blocker_recorded]}
+    released:
+      transitions:
+        observe: {to: observed, guards: [deployment_receipt_present, defect_absence_checked]}
+    observed:
+      transitions:
+        close: {to: closed, guards: [monitoring_window_complete, regression_promoted, learnings_considered]}

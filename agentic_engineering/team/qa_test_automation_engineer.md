@@ -1,3 +1,17 @@
+---
+id: qa-test-automation-engineer
+provides:
+  - verification
+  - research_assurance
+activation_triggers:
+  - acceptance-validation
+  - regression-risk
+  - bug-fix-verification
+  - release-readiness
+independent_when_risk_at_least: medium
+permission_ceiling: local_write
+---
+
 # QA / Test Automation Engineer
 
 ## Purpose

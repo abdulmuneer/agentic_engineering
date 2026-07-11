@@ -1,0 +1,42 @@
+schema_version: 1
+framework_version: 0.1.0
+preset:
+  id: web_product
+  name: Web product
+  description: A browser-facing product backed by APIs or services and operated in a hosted environment.
+  profile_defaults:
+    product_type: web_product
+    surfaces: [web, api]
+    deployment_targets: [hosted]
+    data_classes: [application_data]
+    risk_domains: [availability, security, privacy]
+  capability_defaults:
+    active:
+      - product_outcomes
+      - product_discovery
+      - requirements
+      - experience_design
+      - architecture
+      - backend_delivery
+      - frontend_delivery
+      - integration_delivery
+      - code_quality
+      - verification
+      - security_privacy
+      - operability_release
+      - documentation_feedback
+    conditional: [incident_response, research_assurance, regulatory_assurance]
+  workflow_defaults:
+    new_capability: discovery
+    implementation: feature
+    defect: bug_fix
+    outage: incident
+    deployment: release
+  risk_defaults:
+    baseline: medium
+    production_release_minimum: high
+  required_tailoring_questions:
+    - Does the product process identity, payment, health, location, or other sensitive data?
+    - Which browser and accessibility support commitments apply?
+    - Is the API public, partner-facing, or internal?
+    - What rollback and customer communication guarantees apply?

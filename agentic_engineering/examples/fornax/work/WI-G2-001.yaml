@@ -1,0 +1,169 @@
+schema_version: 1
+framework_version: 0.1.0
+
+work_item:
+  id: WI-G2-001
+  title: Validate bounded physical distributed correctness
+  type: research
+  workflow: research_spike
+  state:
+    current: accepted
+    history:
+      - from: null
+        to: draft
+        sequence: 1
+        event: create
+        at: "2026-07-10T09:55:00Z"
+        actor: human:project-owner
+        guard_refs: []
+        confirmed_guard_refs: []
+      - from: draft
+        to: scoped
+        sequence: 2
+        event: scope_research
+        at: "2026-07-10T10:00:00Z"
+        actor: human:project-owner
+        guard_refs:
+          - question_defined
+          - timebox_defined
+          - allowed_outputs_defined
+          - stop_conditions_defined
+        confirmed_guard_refs: []
+      - from: scoped
+        to: approved
+        sequence: 3
+        event: approve_research
+        at: "2026-07-10T10:05:00Z"
+        actor: human:project-owner
+        guard_refs:
+          - accountable_human_named
+          - permissions_classified
+          - evidence_plan_defined
+        confirmed_guard_refs: []
+      - from: approved
+        to: running
+        sequence: 4
+        event: start_research
+        at: "2026-07-10T10:10:00Z"
+        actor: agent:runtime-integration
+        guard_refs:
+          - permissions_satisfied
+        confirmed_guard_refs: [permissions_satisfied]
+        approval_refs:
+          - DEC-G2-PERMISSION
+      - from: running
+        to: synthesis
+        sequence: 5
+        event: synthesize_evidence
+        at: "2026-07-10T11:50:00Z"
+        actor: agent:numerical-correctness
+        guard_refs:
+          - sources_recorded
+          - evidence_receipts_present
+          - unknowns_recorded
+        confirmed_guard_refs: [evidence_receipts_present]
+        evidence_refs:
+          - EV-G2-001
+      - from: synthesis
+        to: review
+        sequence: 6
+        event: request_independent_review
+        at: "2026-07-10T11:55:00Z"
+        actor: agent:numerical-correctness
+        guard_refs:
+          - claims_bounded_to_evidence
+          - options_and_tradeoffs_recorded
+        confirmed_guard_refs: [claims_bounded_to_evidence]
+        evidence_refs:
+          - EV-G2-001
+      - from: review
+        to: accepted
+        sequence: 7
+        event: accept_g2_evidence
+        at: "2026-07-10T12:00:00Z"
+        actor: human:project-owner
+        guard_refs:
+          - assurance_satisfied
+          - decision_or_next_step_recorded
+        confirmed_guard_refs: [assurance_satisfied, decision_or_next_step_recorded]
+        evidence_refs:
+          - EV-G2-001
+        approval_refs:
+          - DEC-G2-OUTCOME
+  source_refs:
+    - PLAN-FORNAX-V4
+  source_revision: "4"
+  objective: >-
+    Exercise the production stage protocol across two physical nodes and show
+    reference-equivalent output, bounded backpressure, and correct cancellation
+    for the named fixture scenario.
+  accountable_human: human:project-owner
+  required_capabilities:
+    - requirements
+    - architecture
+    - backend_delivery
+    - integration_delivery
+    - code_quality
+    - verification
+    - security_privacy
+    - operability_release
+    - research_assurance
+  change:
+    surfaces:
+      - stage-protocol
+      - physical-lab-network
+    production_affecting: false
+    authentication: false
+    authorization: false
+    sensitive_data: false
+    safety_impact: none
+    regulated_impact: false
+    destructive_migration: false
+    external_write: true
+    reversibility: moderate
+    blast_radius: multi_component
+  risk:
+    declared_tier: high
+    effective_tier: high
+    assurance_level: A2
+    rule_refs:
+      - physical-capability-claim
+      - external-lab-write
+  route: research_spike
+  acceptance:
+    - id: AC-G2-01
+      statement: Both physical nodes negotiate and use the production protocol version.
+    - id: AC-G2-02
+      statement: Physical stage output is within the frozen numerical-reference tolerance.
+    - id: AC-G2-03
+      statement: Backpressure bounds in-flight requests and cancellation releases resources.
+  evidence_plan:
+    - acceptance_ref: AC-G2-01
+      kinds:
+        - integration_test
+        - experiment_result
+        - review
+      environment: physical-two-node-lab
+      minimum_assurance: A2
+    - acceptance_ref: AC-G2-02
+      kinds:
+        - integration_test
+        - experiment_result
+        - review
+      environment: physical-two-node-lab
+      minimum_assurance: A2
+    - acceptance_ref: AC-G2-03
+      kinds:
+        - integration_test
+        - experiment_result
+        - review
+      environment: physical-two-node-lab
+      minimum_assurance: A2
+  permission_classes:
+    - local_write
+    - external_write
+  work_packet_refs:
+    - AWP-G2-001
+  decision_refs:
+    - DEC-G2-PERMISSION
+    - DEC-G2-OUTCOME

@@ -1,0 +1,27 @@
+schema_version: 1
+framework_version: 0.1.0
+
+evidence:
+  id: EV-G2-ACTION
+  work_item_ref: WI-G2-001
+  packet_ref: AWP-G2-001
+  acceptance_refs: []
+  kind: approval
+  subject:
+    ref: fixture://fornax/g2/two-node-trace.json
+  producer:
+    actor: agent:runtime-integration
+    run_id: fornax-g2-action-001
+    type: agent
+    context_manifest_digest: sha256:3333333333333333333333333333333333333333333333333333333333333333
+  method:
+    description: Record completion of the exact external lab write authorized by DEC-G2-PERMISSION.
+    environment: physical-two-node-lab
+  result: pass
+  observed_at: "2026-07-10T11:30:00Z"
+  artifacts: []
+  claims_authorized: [bounded_external_lab_write_completed]
+  claims_forbidden: [production_deployment, broader_lab_access]
+  approval_ref: human:project-owner
+  authorization_ref: DEC-G2-PERMISSION
+  action_scope: Run the named G2 two-node fixture and write only its trace artifacts.

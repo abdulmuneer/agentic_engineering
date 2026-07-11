@@ -1,0 +1,49 @@
+schema_version: 1
+framework_version: 0.1.0
+
+work_packet:
+  id: AWP-G2-001
+  work_item_ref: WI-G2-001
+  date: "2026-07-10"
+  work_mode: agent_executed_human_review
+  loop_type: research_spike
+  accountable_human: human:project-owner
+  producer:
+    actor: agent:runtime-integration
+    actor_kind: agent
+    run_id: fornax-g2-implementation-001
+    skill_refs: []
+    tooling: [runtime_fixture, trace_ledger]
+    context_manifest_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+  capability_refs: [backend_delivery, integration_delivery]
+  permission_classes: [local_write, external_write]
+  approval_refs: [DEC-G2-PERMISSION]
+  action_receipt_refs: [EV-G2-ACTION]
+  status: accepted
+  goal: Exercise the bounded two-node physical fixture without broadening its claim boundary.
+  context:
+    - kind: document
+      ref: project-plan-v4.md
+    - kind: file
+      ref: work/WI-G2-001.yaml
+  assumptions: []
+  changes_or_outputs:
+    - kind: artifact
+      ref: fixture://fornax/g2/two-node-trace.json
+      summary: Physical two-node trace produced by the runtime integration run.
+  verification_evidence_refs: [EV-G2-001, EV-G2-EXPERIMENT, EV-G2-REVIEW]
+  claims_requested:
+    - physical_two_node_protocol_correctness_for_named_fixture
+    - numerical_equivalence_for_named_fixture
+    - bounded_backpressure_and_cancellation_for_named_fixture
+  claims_forbidden:
+    - frontier_capacity
+    - production_resilience
+    - unattended_operation
+    - performance_superiority
+    - product_readiness
+  skipped_checks: []
+  risks: []
+  open_questions: []
+  review_refs: [EV-G2-REVIEW]
+  promotion_candidates: []

@@ -1,6 +1,6 @@
 # Trackers
 
-This folder stores reusable tracker templates and active cross-sprint trackers for program execution.
+This folder stores reusable human-readable tracker templates. In projects using the executable kernel, canonical state lives in `.agentic/records` and tracker/status tables should be generated from those records. Do not maintain the same fact manually in both places.
 
 ## Trackers
 

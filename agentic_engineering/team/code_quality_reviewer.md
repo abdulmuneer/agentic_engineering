@@ -1,3 +1,16 @@
+---
+id: code-quality-reviewer
+provides:
+  - code_quality
+activation_triggers:
+  - implementation-ready-for-review
+  - high-risk-code-change
+  - architecture-conformance-review
+  - recurring-quality-defect
+independent_when_risk_at_least: medium
+permission_ceiling: read_only
+---
+
 # Code Quality Reviewer
 
 ## Purpose

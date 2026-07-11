@@ -1,3 +1,17 @@
+---
+id: devops-sre-release-engineer
+provides:
+  - operability_release
+  - incident_response
+activation_triggers:
+  - ci-cd-or-infrastructure-change
+  - release-or-deployment
+  - production-reliability-or-observability-change
+  - incident-or-recovery
+independent_when_risk_at_least: high
+permission_ceiling: production
+---
+
 # DevOps / SRE / Release Engineer
 
 ## Purpose

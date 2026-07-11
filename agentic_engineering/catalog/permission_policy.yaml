@@ -1,0 +1,43 @@
+schema_version: 1
+framework_version: 0.1.0
+permission_policy:
+  id: core-permission-policy
+  classes:
+    - id: read_only
+      rank: 1
+      examples: [local_files, public_docs, approved_logs]
+      approval: task_authorization
+    - id: local_write
+      rank: 2
+      examples: [workspace_files, tests, local_docs]
+      approval: review_before_merge
+    - id: external_read
+      rank: 3
+      examples: [private_api, issue_tracker, cloud_metadata]
+      approval: required_when_credentials_cost_or_private_data_apply
+    - id: external_write
+      rank: 4
+      examples: [issue_update, pull_request, package_publish, vendor_resource]
+      approval: before_action
+    - id: sensitive
+      rank: 5
+      examples: [secrets, personal_data, customer_data, auth_controls, payments]
+      approval: before_access_and_before_action
+    - id: production
+      rank: 6
+      examples: [deploy, rollback, production_data, dns, billing, customer_visible_config]
+      approval: before_action_and_release_gate
+  rules:
+    least_privilege: true
+    permission_ceiling_required_for_agents: true
+    scope_change_requires_new_approval: true
+    approval_binding_fields: [subject_ref, action, permission_class, approver, granted_at, expires_at]
+    action_receipt_required_for: [external_write, sensitive, production]
+  mandatory_stops:
+    - unapproved_permission_escalation
+    - unapproved_destructive_action
+    - credentials_or_private_data_not_authorized
+    - security_privacy_legal_or_compliance_concern
+    - unverifiable_output
+    - scope_change
+    - repeated_same_failure

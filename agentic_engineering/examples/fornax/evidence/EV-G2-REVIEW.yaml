@@ -1,0 +1,33 @@
+schema_version: 1
+framework_version: 0.1.0
+
+evidence:
+  id: EV-G2-REVIEW
+  work_item_ref: WI-G2-001
+  packet_ref: AWP-G2-001
+  acceptance_refs: [AC-G2-01, AC-G2-02, AC-G2-03]
+  kind: review
+  subject:
+    ref: WI-G2-001
+  producer:
+    actor: human:technical-lead
+    run_id: fornax-g2-independent-review-001
+    type: human
+    context_manifest_digest: sha256:5555555555555555555555555555555555555555555555555555555555555555
+  method:
+    description: Independently review the experiment protocol, receipts, acceptance coverage, and claim boundary.
+    environment: physical-two-node-lab
+  result: pass
+  observed_at: "2026-07-10T11:55:00Z"
+  artifacts: []
+  claims_authorized:
+    - physical_two_node_protocol_correctness_for_named_fixture
+    - numerical_equivalence_for_named_fixture
+    - bounded_backpressure_and_cancellation_for_named_fixture
+  claims_forbidden:
+    - frontier_capacity
+    - production_resilience
+    - unattended_operation
+    - performance_superiority
+    - product_readiness
+  approval_ref: human:project-owner

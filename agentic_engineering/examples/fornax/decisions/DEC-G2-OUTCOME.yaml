@@ -1,0 +1,24 @@
+schema_version: 1
+framework_version: 0.1.0
+
+decision:
+  id: DEC-G2-OUTCOME
+  type: product
+  title: Accept the bounded G2 physical-fixture result
+  subject_refs: [WI-G2-001]
+  options:
+    - id: accept-bounded-result
+      summary: Accept only the claims authorized by EV-G2-001.
+      tradeoffs: [Does not imply frontier capacity or production readiness]
+    - id: collect-more
+      summary: Repeat or broaden the experiment before accepting a result.
+      tradeoffs: [Consumes additional lab capacity]
+  outcome:
+    disposition: commit
+    selected_option_ref: accept-bounded-result
+  rationale: Independent passing evidence covers all three acceptance criteria within the named fixture.
+  owner: human:project-owner
+  reviewers: [human:technical-lead]
+  evidence_refs: [EV-G2-001]
+  guard_authorizations: [decision_or_next_step_recorded]
+  decided_at: "2026-07-10T12:00:00Z"

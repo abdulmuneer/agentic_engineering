@@ -1,0 +1,43 @@
+schema_version: 1
+framework_version: 0.1.0
+preset:
+  id: research_platform
+  name: Research platform
+  description: A research-oriented codebase whose outputs include experiments, benchmarks, models, or scientific claims.
+  profile_defaults:
+    product_type: research_platform
+    surfaces: [library, experiment, cli]
+    deployment_targets: [local, compute_cluster]
+    data_classes: [research_data]
+    risk_domains: [reproducibility, claim_validity, provenance, compute_cost]
+  capability_defaults:
+    active:
+      - product_outcomes
+      - product_discovery
+      - requirements
+      - experience_design
+      - architecture
+      - backend_delivery
+      - integration_delivery
+      - code_quality
+      - verification
+      - security_privacy
+      - operability_release
+      - documentation_feedback
+      - research_assurance
+    conditional: [frontend_delivery, incident_response, regulatory_assurance]
+  workflow_defaults:
+    research_question: research_spike
+    product_hypothesis: discovery
+    implementation: feature
+    defect: bug_fix
+    publication_or_distribution: release
+  risk_defaults:
+    baseline: medium
+    externally_published_claim_minimum: high
+    sensitive_dataset_minimum: high
+  required_tailoring_questions:
+    - Which environments and seeds are required for reproducibility?
+    - What evidence authority is required for each class of claim?
+    - Are datasets licensed, sensitive, representative, and versioned?
+    - Which benchmark, model, code, and hardware versions must be retained?

@@ -1,0 +1,24 @@
+schema_version: 1
+framework_version: 0.1.0
+decision:
+  id: DEC-0001
+  type: discovery
+  title: Commit the validated sample outcome to delivery
+  subject_refs: [DISC-0001]
+  options:
+    - id: OPTION-COMMIT
+      summary: Commit the outcome to bounded delivery.
+      tradeoffs: [Consumes implementation and review capacity.]
+    - id: OPTION-PARK
+      summary: Park the outcome until stronger evidence is available.
+      tradeoffs: [Delays learning from implementation.]
+  outcome:
+    disposition: commit
+    selected_option_ref: OPTION-COMMIT
+  rationale: Replace with a rationale bounded to recorded discovery evidence.
+  owner: human:owner
+  reviewers: []
+  evidence_refs: []
+  guard_authorizations: [review_capacity_available]
+  decided_at: "2026-01-01T00:00:00Z"
+  revisit_when: [material_assumption_changes]

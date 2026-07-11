@@ -2,6 +2,17 @@
 
 This template defines how the team uses the workspace structure to take an idea from intake to production and then repeat through the next sprint. It supports both human-led work and bounded agentic workflows.
 
+## Template Versus Project Guidance
+
+This file is a reusable handbook. In an initialized product repository, `.agentic/program.yaml` and `.agentic/records` are the enforceable project state, while `.agentic/generated/AGENTS.md` is the concise agent-facing view. Do not hand-edit the generated view or let this generic template override a newer project source revision.
+
+Before substantive work:
+
+1. Run `agentic validate .` and resolve source, capability, or generated-view drift.
+2. Route the work item with `agentic route <ID> --root .`.
+3. Use the selected workflow from `catalog/workflows`, not the entire lifecycle as a mandatory sequence.
+4. Respect the calculated risk tier, assurance level, permission ceiling, and evidence plan.
+
 ## Folder Structure
 
 | Folder | Purpose |
@@ -47,6 +58,8 @@ Use agents when they improve throughput without weakening evidence, reviewabilit
 6. **Compound learning.** Repeated successful patterns should be promoted into `agentic/skill_registry.md`, `agentic/eval_registry.md`, tests, runbooks, or process updates.
 
 ## End-To-End Operating Process
+
+The following stages are a coverage map. Discovery, research spikes, features, bug fixes, incidents, and releases use different state machines. A project may omit or defer capabilities only through the dispositions recorded in its program manifest.
 
 ### 1. Capture The Idea
 
