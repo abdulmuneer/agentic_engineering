@@ -16,12 +16,14 @@ This repository provides a working structure for that environment:
 
 - Define the outcome before execution starts.
 - Keep ownership explicit, even when work is delegated.
-- Break work into reviewable packets with context, evidence, assumptions, and risks.
-- Use role-based review gates for product, design, architecture, code quality, security, QA, release, and documentation.
-- Track decisions, dependencies, risks, capacity, test readiness, and release readiness in plain files.
-- Convert repeated lessons into reusable processes, checks, tests, and templates.
+- Match control to the agent: planners judge, workers run bounded tasks, executors follow tickets.
+- Gate consequential steps; let local, reversible work run.
+- Close work with results that point to receipts and state what they do not establish.
+- Use role-based review gates for high-risk delivery: product, design, architecture, code quality, security, QA, release, and documentation.
+- Track decisions, standing authorizations, budgets and shared capacity in plain files.
+- Convert repeated lessons into reusable processes, checks, tests, and templates, and retire the ones that stop paying.
 
-In short: this repo is about making delegated software delivery disciplined instead of chaotic.
+In short: this repo is about making delegated work disciplined without making it slow.
 
 ## Why It Exists
 
@@ -33,11 +35,30 @@ This framework preserves engineering judgment while making the operating approac
 
 ## Principles
 
-- **Accountability stays human.** Tools and agents can perform work, but approval, prioritization, and production responsibility remain assigned to people.
-- **Evidence beats confidence.** A completed task should point to changed files, tests run, skipped checks, decisions made, and remaining risks.
-- **Roles are lenses, not bureaucracy.** The 12-role structure captures the perspectives needed to ship responsibly; it does not require a 12-person team.
-- **Permissions should match risk.** Read-only research, local edits, external writes, production changes, and sensitive data access need different controls.
-- **Learning should compound.** Repeated mistakes become tests or guardrails. Repeated success becomes a reusable workflow.
+- **Accountability stays human.** Agents perform and decide work within written rules; goals, priority, promotion, risk acceptance and outward-facing actions stay with named people.
+- **Judgment is delegated; consequences are verified.** Capable agents are briefed with the reason for the work and trusted to decide within their tier. Verification happens where being wrong would cost something, not at every step.
+- **Gate on consequence, not on activity.** Local, reversible work proceeds without approval or records. Compute spend above budget, publication, promotion, data rights, destructive and production actions need a decision or a standing authorization.
+- **Evidence beats confidence.** A result points to receipts emitted by tools, to independent evidence (a gold set, a readback, a bar fixed before the read), and to the claims it does not establish.
+- **Attention, tokens and capacity are budgets.** Every model call re-reads its whole context and every peer message wakes another one. Budget human review time, tokens, coordination and shared compute explicitly.
+- **Learning compounds, and so does guidance.** Repeated mistakes become tests, hooks or rules; superseded and unused guidance is retired, because every agent pays for it on every call.
+
+## What Changed After Real Use
+
+The first version treated agents as untrusted executors: every transition of every work item needed packet-bound evidence and a human approval. Applied to a machine-learning research program run by several capable agent sessions, work items stayed in draft while the work finished, evidence files grew to hundreds of megabytes, and parallel executors spent several hundred million tokens in three days re-reading protocol and records. A lean protocol (why each run exists, a queue, one folder per run with README, status and results, tool-emitted receipts, the human deciding only promotion, priority and rights) replaced it and worked better.
+
+This version keeps the original purpose and takes the lean protocol's lessons into the kernel:
+
+| Change | Where |
+|---|---|
+| Lean `run` workflow (`record_mode: ledger`): draft, running, closed or stopped; no packets or evidence records; results with receipts and claims not established; rejected for high- or critical-risk work | `catalog/workflows/run.yaml` |
+| Actor tiers (planner, worker, executor) with model, turn cap and token budget; executors limited to local writes and never own or review a capability | `agentic/agent_tiers.md`, program schema |
+| Standing authorizations: one decision with scope, actors and expiry covers a repeated consequential step across work items | `agentic/permission_model.md`, decision schema |
+| Independent evidence (gold set, readback, bar fixed before the read) satisfies reviewer independence; human acceptance stays where required; a bar must cover every claim | assurance policy, evidence schema |
+| Budgets (tokens, context, coordination, human review time) and resources (owner, capacity, rule) | `agentic/cadence_controls.md`, program schema |
+| `agentic status` (one line per item), `validate --max-issues`, generated `decisions.md` | runtime CLI |
+| Research preset defaults to low risk and the `run` workflow, with a reduced capability set | `presets/research_platform.yaml` |
+
+The full account, including what the first version got right, is in [lessons from practice](agentic_engineering/agentic/lessons_from_practice.md).
 
 ## How The Executable Kernel Works
 
@@ -95,7 +116,9 @@ framework.
 - [Codex skill](skills/agentic-engineering/SKILL.md) orchestrates bootstrap,
   operation, audit, and governed upgrades through the executable kernel.
 - [Adoption guide](agentic_engineering/guides/adoption.md) explains tailoring and migration.
-- [Fornax example](agentic_engineering/examples/fornax/README.md) demonstrates domain-specific roles, evidence, and drift rejection.
+- [Lessons from practice](agentic_engineering/agentic/lessons_from_practice.md) explains why the controls are shaped this way.
+- [Lean research example](agentic_engineering/examples/lean-research) shows tiers, budgets, a resource, a standing authorization and a closed `run`.
+- [Fornax example](agentic_engineering/examples/fornax/README.md) demonstrates domain-specific roles, evidence, and drift rejection on the gated path.
 - [Operating process](agentic_engineering/AGENTS_template.md) describes the end-to-end workflow.
 - [Team roles](agentic_engineering/team) define the role lenses and review responsibilities.
 - [Executable catalogs](agentic_engineering/catalog) define risk-adaptive workflows and control policies.
@@ -104,6 +127,19 @@ framework.
 - [Delegated workflow controls](agentic_engineering/agentic) cover loops, permissions, work packets, cadence, reusable skills, and evaluation checks.
 
 ## How To Use It
+
+For research and bounded engineering (low or medium risk), the lean path is enough:
+
+1. Initialize with the `research_platform` preset, declare actors with tiers, budgets and
+   resources, list the consequential steps, and have the accountable human confirm.
+2. Record standing authorizations for repeated consequential steps.
+3. Create a work item in the `run` workflow, assess its consequence facts and record the
+   route with `agentic route <id> --write`; keep its README, status and results in the run's
+   folder. Move it `draft` -> `running` -> `closed` (or `stopped`).
+4. Close with `results`: a reference to the results file, tool-emitted receipts, and the claims
+   not established. Check in with `agentic status`.
+
+For high- or critical-risk work, releases and incidents, use the gated path:
 
 1. Initialize an overlay using the closest preset.
 2. Answer the persisted questions by tailoring `.agentic/program.yaml`: update
@@ -201,6 +237,7 @@ This is not tied to a specific vendor, assistant, IDE, or orchestration tool. Th
     ├── runtime/
     ├── templates/overlay/
     ├── examples/fornax/
+    ├── examples/lean-research/
     ├── team/
     ├── agentic/
     ├── program/

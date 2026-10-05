@@ -1,13 +1,19 @@
 ---
 name: agentic-engineering
-description: Bootstrap, tailor, validate, operate, audit, and upgrade the Agentic Engineering workflow in product repositories using the agentic CLI and canonical .agentic records. Use when Codex needs to initialize a governed agent program, select a preset and capabilities, define humans/agents/automation, create or route work, issue work packets, record evidence or decisions, transition workflow state, diagnose validation failures, or review framework/source drift.
+description: Bootstrap, tailor, validate, operate, audit, and upgrade the Agentic Engineering workflow in product repositories using the agentic CLI and canonical .agentic records. Use when an agent needs to initialize a governed agent program, select a preset and capabilities, define humans and agent tiers, budgets and resources, create or route work (lean runs or gated work), record decisions and standing authorizations, close results with receipts, transition workflow state, diagnose validation failures, or review framework/source drift.
 ---
 
 # Agentic Engineering
 
 Use the skill as the intent-aware orchestration layer. Use the installed `agentic`
 CLI, catalogs, schemas, and validators as the enforcement layer. Never duplicate
-or weaken those controls in ad hoc files or prose.
+or weaken those controls in ad hoc files or prose, and never re-create them as a
+prose protocol for parallel agents to re-read: that is where the first version's
+cost came from.
+
+Judgment is delegated; consequences are verified. Gate consequential steps only,
+keep one ledger, reference tool-emitted receipts, and treat human attention,
+tokens, coordination and shared capacity as budgets.
 
 ## Resolve the mode
 
@@ -51,25 +57,31 @@ gate; it is not a formatting step.
 
 ### Operate a program
 
-Follow [references/operating-loop.md](references/operating-loop.md). Prefer a
-discovery item when the user problem or value hypothesis is unvalidated. Prefer
-delivery workflows only when an approved outcome already exists.
+Follow [references/operating-loop.md](references/operating-loop.md). Use the
+lean `run` workflow for low- and medium-risk research and bounded engineering;
+use `discovery` when the problem or value hypothesis is unvalidated, and gated
+delivery workflows for high- or critical-risk work, releases and incidents.
 
-Use CLI authoring commands for new records and `apply_patch` for bounded edits to
+For a lean run, do the work, then close it with results (reference, receipts,
+claims not established). Check in with `agentic status`. Run the validator at
+transitions, not inside the work loop.
+
+For gated work, use CLI authoring commands for new records and bounded edits to
 canonical YAML. After each material mutation:
 
 1. Run `agentic route` for affected work when risk or scope changed.
 2. Run `agentic render <product-root>`.
-3. Run `agentic validate <product-root> --strict`.
-4. Transition only when every guard is satisfied by canonical state or an exact,
-   typed receipt.
+3. Run `agentic validate <product-root> --strict --max-issues 20`.
+4. Transition only when every guard is satisfied by canonical state, an exact
+   typed receipt, or an unexpired standing authorization that covers it.
 
 ### Audit a program
 
 Run strict validation, then report:
 
 - current work and workflow states;
-- pending human decisions or tailoring answers;
+- pending human decisions, tailoring answers, and expiring standing
+  authorizations;
 - unresolved risk facts, permissions, and waivers;
 - missing packet, evidence, review, or action receipts;
 - framework/source lock drift; and
@@ -79,7 +91,8 @@ Do not implement fixes during an audit unless the user also asks for changes.
 
 ## Preserve human authority
 
-Stop and request explicit direction before:
+Stop and request explicit direction before the following, unless an unexpired
+standing authorization covers the exact step:
 
 - confirming tailoring;
 - marking a discovery outcome committed, narrowed, killed, or parked;
@@ -89,12 +102,14 @@ Stop and request explicit direction before:
 - rebasing the authoritative source; or
 - performing external, sensitive, destructive, or production actions.
 
-Agents may prepare records and recommendations. They may not impersonate the
-accountable human or manufacture approvals.
+Do not stop for local, reversible work. Agents may prepare records,
+recommendations and proposed standing authorizations. They may not impersonate
+the accountable human or manufacture approvals.
 
 ## Finish with evidence
 
-Do not claim success from a narrative summary. Finish only after the relevant
-canonical records exist and strict validation passes. Report created or changed
+Do not claim success from a narrative summary. A lean run finishes with results
+that reference receipts and list the claims not established. Gated work finishes
+only after the relevant canonical records exist and strict validation passes. Report created or changed
 record IDs, the current workflow state, validation results, unresolved human
 gates, and the next permitted transition.

@@ -8,6 +8,9 @@ from typing import Any
 from .io import framework_root, load_yaml
 
 
+RECORD_MODES = ("gated", "ledger")
+
+
 def _indexed(value: Any, key: str = "id") -> dict[str, dict[str, Any]]:
     if isinstance(value, dict):
         if all(isinstance(item, dict) for item in value.values()):
@@ -106,6 +109,16 @@ def load_catalog(root: Path | None = None) -> Catalog:
         permission_policy=policy("permission_policy"),
         evidence_policy=policy("evidence_policy"),
     )
+
+
+def workflow_record_mode(workflow: dict[str, Any] | None) -> str:
+    """Return "ledger" for lean workflows that record results by reference, else "gated"."""
+    value = workflow.get("record_mode") if isinstance(workflow, dict) else None
+    return value if value in RECORD_MODES else "gated"
+
+
+def is_ledger(workflow: dict[str, Any] | None) -> bool:
+    return workflow_record_mode(workflow) == "ledger"
 
 
 def workflow_states(workflow: dict[str, Any]) -> list[str]:

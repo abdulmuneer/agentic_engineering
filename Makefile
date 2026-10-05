@@ -8,6 +8,7 @@ test:
 validate:
 	$(PYTHON) -m agentic_engineering.runtime validate-framework agentic_engineering --strict
 	$(PYTHON) -m agentic_engineering.runtime validate agentic_engineering/examples/fornax --strict
+	$(PYTHON) -m agentic_engineering.runtime validate agentic_engineering/examples/lean-research --strict
 
 check:
 	$(PYTHON) -m py_compile agentic_engineering/runtime/*.py

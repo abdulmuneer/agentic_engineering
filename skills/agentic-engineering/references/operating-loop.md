@@ -1,13 +1,36 @@
 # Operate The Program
 ## Choose a workflow
 
+- Use `run` for low- or medium-risk research, experiments, benchmark reads, data
+  jobs and bounded engineering. It needs no packets or evidence records.
 - Use `discovery` for an unvalidated problem, actor, or value hypothesis.
-- Use `feature` for an approved capability outcome.
-- Use `research_spike` for a bounded technical or domain unknown.
+- Use `feature` for an approved capability outcome with high or critical risk.
+- Use `research_spike` for a bounded unknown whose answer must be reviewed before
+  anything depends on it.
 - Use `bug_fix`, `incident`, or `release` for their named operational contexts.
 
 Inspect the selected workflow catalog before transitioning. Do not guess state
 names or guards.
+
+## Lean run
+
+1. `agentic new-work <id> --workflow run --title "<outcome>" --root <root>`;
+   set objective, acceptance and consequence facts. Keep the run's README,
+   status and results files in its folder; do not write a parallel journal.
+   Record the computed risk with `agentic route <id> --root <root> --write`.
+2. Transition to `running`. Do the work. A consequential step (compute above
+   budget, publication, promotion, data rights, destructive, production) cites a
+   decision or an unexpired standing authorization; otherwise stop and ask.
+3. Verify where being wrong would cost something: a gold set, a readback, or a
+   bar fixed before the read that covers every claim.
+4. Fill `results`: `ref`, tool-emitted `receipts` (uri, sha256), and
+   `not_established`. Transition to `closed`, or to `stopped` with partial
+   findings. A negative result closes a run.
+5. Check in with `agentic status <root>`; run `validate --max-issues 20` only at
+   transitions or when something looks wrong. Do not run the validator inside the
+   work loop.
+
+## Gated work
 
 ## Create and assess work
 
@@ -86,7 +109,15 @@ guard. Never use an unrelated work-bound receipt as a substitute.
   decision bound to the program ID and exact relative path, version, and SHA-256.
   Use `agentic source-update`; never hand-edit the digest.
 
-## Cadence
+## Budgets and coordination
+
+- Use the cheapest tier that can do a task; give executors fully specified
+  tickets.
+- Respect `budgets` in `program.yaml`. Stop at a checkpoint before exceeding one.
+- Message peers only for decisions, hand-overs and failures. Status goes in the
+  status file for the next check-in.
+
+## Cadence for gated work
 Repeat:
 
 ```text

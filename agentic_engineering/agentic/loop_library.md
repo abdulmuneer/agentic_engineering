@@ -6,11 +6,44 @@ This document explains the loops. The machine-readable state transitions and gua
 
 ## Loop Rules
 
-- Every loop has an accountable human.
-- Every loop has a stop condition.
-- Every loop returns a work packet.
-- High-risk loops require permission review before execution.
+- Every loop has an accountable human and a stop condition.
+- Low- and medium-risk research and engineering use the lean run loop. The gated loops below
+  are for high- and critical-risk work, releases and incidents.
+- Lean runs return a results file; gated loops and executor tickets return a work packet.
+- Consequential steps need a decision or a standing authorization, in any loop.
 - Repeated successful loops should be promoted into skills.
+
+## Run Loop (lean, `run` workflow)
+
+Use for research questions, experiments, benchmark reads, data jobs and bounded engineering
+whose routed risk is low or medium. The runtime rejects high- or critical-risk work in this
+workflow.
+
+The ledger is three files in the run's folder:
+
+- `README.md`: why the run exists, the recipe, pinned inputs, the bar fixed before the read,
+  the consequential steps and the decisions that cover them, the budget;
+- `status.md`: four header lines (Owner, Updated, Next, Blocker), then dated entries of at most
+  three lines;
+- `results.md`: numbers, identities, receipts (URI and checksum), and the claims not
+  established.
+
+States: `draft` -> `running` -> `closed`, or `stopped` with partial findings. A negative result
+closes a run.
+
+Evidence required:
+
+- Receipts emitted by tools, referenced from `results.md` and the work item's `results`.
+- Independent evidence where being wrong would cost something: a gold set, a readback, or a
+  bar fixed before the read that covers every claim the result makes.
+- The claims not established.
+
+Stop conditions:
+
+- A consequential step that no decision or standing authorization covers.
+- The budget is about to be exceeded.
+- The same failure repeats.
+- The result contradicts the pre-registered expectation and the next step depends on it.
 
 ## Discovery Loop
 
@@ -226,6 +259,8 @@ Allowed outputs:
 - Test candidate.
 - Runbook update.
 - Process improvement.
+- Hook or check that enforces a rule outside the agent's loop.
+- Retirement of a rule, memory entry or document section that no longer earns its context.
 
 Evidence required:
 
@@ -237,3 +272,7 @@ Stop conditions:
 
 - The learning is speculative and not grounded in evidence.
 - The asset would duplicate existing guidance.
+
+Retire as well as promote. Every agent re-reads shared guidance on every call, so a rule that
+is superseded, stale or never triggered is a standing cost. When a new rule supersedes an old
+one, replace it rather than stacking both.

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from .authorization import authorization_of, is_standing, parse_datetime
 from .catalog import Catalog, load_catalog
 from .io import load_record, load_yaml, locate_overlay, principal_id, record_files
 
@@ -166,6 +167,82 @@ def _active_work(overlay: Path) -> str:
     return "\n".join(lines)
 
 
+def _decision_citations(overlay: Path) -> dict[str, list[str]]:
+    cited: dict[str, set[str]] = {}
+    for path in record_files(overlay, "work"):
+        try:
+            record, _ = load_record(path)
+        except (OSError, ValueError):
+            continue
+        work_id = str(record.get("id", path.stem))
+        refs = [item for item in record.get("decision_refs", []) if isinstance(item, str)]
+        state = record.get("state")
+        for event in state.get("history", []) if isinstance(state, dict) else []:
+            if isinstance(event, dict):
+                refs.extend(item for item in event.get("approval_refs", []) if isinstance(item, str))
+        risk = record.get("risk")
+        if isinstance(risk, dict) and isinstance(risk.get("waiver_ref"), str):
+            refs.append(risk["waiver_ref"])
+        for ref in refs:
+            cited.setdefault(ref, set()).add(work_id)
+    return {key: sorted(value) for key, value in cited.items()}
+
+
+def _decisions(overlay: Path) -> str:
+    """List every decision; dated (expiring or revisit) rows come first, soonest first.
+
+    Order and content depend only on the records, never on the clock, so the view stays stable.
+    """
+    citations = _decision_citations(overlay)
+    rows: list[tuple[tuple[int, float, str], str]] = []
+    for path in record_files(overlay, "decisions"):
+        try:
+            decision, _ = load_record(path)
+        except (OSError, ValueError):
+            continue
+        decision_id = str(decision.get("id", path.stem))
+        authorization = authorization_of(decision)
+        outcome = decision.get("outcome")
+        disposition = outcome.get("disposition", "—") if isinstance(outcome, dict) else "—"
+        standing = is_standing(decision)
+        dates = [
+            (label, str(value))
+            for label, value in (
+                ("expires", authorization.get("expires_at") if standing else None),
+                ("revisit", decision.get("revisit_at")),
+            )
+            if value
+        ]
+        parsed_dates = [parse_datetime(value) for _, value in dates]
+        parsed = min((item for item in parsed_dates if item), default=None)
+        label = "; ".join(f"{name} {value}" for name, value in dates) or "—"
+        sort_key = (0, parsed.timestamp(), decision_id) if parsed else (1, 0.0, decision_id)
+        rows.append(
+            (
+                sort_key,
+                f"| `{decision_id}` | {disposition} | {principal_id(decision.get('owner')) or '—'} | "
+                f"{'yes' if standing else 'no'} | "
+                f"{_principals(authorization.get('applies_to')) if standing else '—'} | {label} | "
+                f"{_principals(citations.get(decision_id))} |",
+            )
+        )
+    lines = [
+        GENERATED_NOTICE,
+        "",
+        "# Decisions",
+        "",
+        "Dated decisions (standing authorizations and revisit dates) are listed first, soonest first.",
+        "",
+        "| ID | Outcome | Owner | Standing | Applies to | Expires or revisit | Cited by |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    lines.extend(row for _, row in sorted(rows, key=lambda item: item[0]))
+    if not rows:
+        lines.append("| — | — | — | — | — | — | No decision records |")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _agents_guidance(program: dict[str, Any], manifest_ref: str) -> str:
     project = program.get("program", {}) if isinstance(program.get("program"), dict) else program
     profile = project.get("profile", {}) if isinstance(project.get("profile"), dict) else {}
@@ -238,6 +315,7 @@ def expected_rendered(
         "operating-model.md": _operating_model(program, control_root),
         "role-coverage.md": _role_coverage(program, catalog),
         "active-work.md": _active_work(overlay),
+        "decisions.md": _decisions(overlay),
         "AGENTS.md": _agents_guidance(program, manifest_ref),
     }
 

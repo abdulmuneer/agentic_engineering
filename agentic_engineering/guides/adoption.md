@@ -109,7 +109,17 @@ specific choices already written into the manifest.
    validator, specialist, and approver must be distinct.
 6. Confirm that every actor's permission ceiling is sufficient for its assigned
    work but no broader than necessary.
-7. Retain the persisted questions, run `agentic tailor --confirm`, then run strict
+7. Give each agent actor a tier (`planner`, `worker`, `executor`), its model, a
+   turn cap where bounded, and a token budget. Executors stay at `local_write`
+   and never own or review a capability.
+8. List the steps that are consequential for this project (compute above budget,
+   publication, promotion, data rights, destructive, production). Everything else
+   runs without approval.
+9. Declare `budgets` (per-run tokens, context, coordination rule, human review
+   minutes per day) and shared `resources` with an owner, capacity and rule.
+10. Record standing authorizations for consequential steps that repeat, each with
+    scope, actors, `applies_to` and an expiry.
+11. Retain the persisted questions, run `agentic tailor --confirm`, then run strict
    validation and commit the overlay with the product.
 
 A new product bet should also have a short discovery record: problem and user
@@ -117,7 +127,30 @@ evidence, riskiest assumption, cheapest useful experiment, falsification
 threshold, timebox, and a `COMMIT`, `NARROW`, `KILL`, or `PARK` decision.
 Routine fixes do not need a new product-discovery document.
 
-## Start Bounded Work
+## Start A Lean Run
+
+Low- and medium-risk research and bounded engineering use the `run` workflow. It has
+no packets, evidence records or per-item approvals; the run's README, status and
+results files are the ledger, and tools emit the receipts.
+
+```bash
+agentic new-work RUN-0001 \
+  --title "Measure X on benchmark Y" \
+  --workflow run \
+  --root /path/to/my-product
+# Edit the objective, acceptance and consequence facts, then record the route:
+agentic route RUN-0001 --root /path/to/my-product --write
+agentic transition RUN-0001 running --root /path/to/my-product --actor agent:planner
+# ... the work runs; consequential steps cite a decision or standing authorization ...
+# Fill `results`: ref to results.md, receipts (uri, sha256), not_established.
+agentic transition RUN-0001 closed --root /path/to/my-product --actor agent:planner
+agentic status /path/to/my-product
+```
+
+The runtime rejects a `run` work item whose routed risk is high or critical; route
+that work through a gated workflow instead.
+
+## Start Gated Work
 
 Create the work item only after the program has been tailored and validated:
 
@@ -248,6 +281,10 @@ receipts.
   suggestions as warnings.
 - Focus operational detail on the next consequential gate. Do not generate empty
   trackers for hypothetical future work.
+- Watch for the signs of a process that is too heavy: work finishing while its
+  records stay in draft, a narrative journal more current than the records,
+  agents asking approval for reversible steps, and peer messages costing more
+  than the human's own turns. See `../agentic/lessons_from_practice.md`.
 
 ## Migrating From The Folder-Copy Model
 

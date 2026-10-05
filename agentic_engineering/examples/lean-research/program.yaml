@@ -1,0 +1,222 @@
+schema_version: 1
+framework_version: 0.1.0
+
+program:
+  id: lean-research
+  name: Lean Research Example
+  description: A research team that gates only consequential steps and records runs by reference.
+  framework_preset: research_platform
+  accountable_human: human:owner
+  source_roots:
+    - .
+  governance_root: .
+  current_gate: G1
+  framework_lock:
+    version: 0.1.0
+    catalog_sha256: fcd8c3931deca97d12c3dfa64b9eb8f1fa07b76a811a27695d991ab575428fbc
+    schemas_sha256: 42a591eb02b022c2c5c3acbed3c56d828525b4e8585588046417baf0ce131a90
+    behavior_sha256: 3e69638ac18c34522ab33e4ea2eeed99194bd4fa7fc8f32c387f05b0d062acb9
+  source_of_truth:
+    path: plan.yaml
+    declared_version: "1"
+    sha256: 58900c3f70f57660127ae8bded1e6e18ec147192383ca3bd2450a59f31f46cf6
+
+  profile:
+    product_type: research_platform
+    lifecycle_phase: validation
+    surfaces: [library, experiment]
+    deployment_targets: [local, compute_cluster]
+    data_classes: [research_data]
+    risk_domains: [reproducibility, claim_validity, provenance, compute_cost]
+
+  budgets:
+    per_run_tokens: 2000000
+    context_tokens: 200000
+    coordination: >-
+      The planner reads the records; workers receive one task slice and return receipts by
+      reference. No agent forwards full context to a peer.
+    human_review_minutes_per_day: 30
+
+  resources:
+    - id: gpu-cluster
+      owner: agent:planner
+      capacity: 4
+      unit: nodes
+      rule: never idle; one run at a time
+
+  capabilities:
+    - id: product_outcomes
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [human:owner]
+
+    - id: requirements
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [human:owner]
+
+    - id: architecture
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [human:owner]
+
+    - id: code_quality
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [agent:planner]
+
+    - id: verification
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [agent:planner]
+
+    - id: security_privacy
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [agent:planner]
+
+    - id: operability_release
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [human:owner]
+
+    - id: documentation_feedback
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [human:owner]
+
+    - id: research_assurance
+      disposition: active
+      owner: human:owner
+      executors: [agent:worker]
+      reviewers: [agent:planner]
+
+    - id: product_discovery
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - product_discovery_activation_trigger_enters_scope
+
+    - id: experience_design
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - experience_design_activation_trigger_enters_scope
+
+    - id: backend_delivery
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - backend_delivery_activation_trigger_enters_scope
+
+    - id: integration_delivery
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - integration_delivery_activation_trigger_enters_scope
+
+    - id: frontend_delivery
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - frontend_delivery_activation_trigger_enters_scope
+
+    - id: incident_response
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - incident_response_activation_trigger_enters_scope
+
+    - id: regulatory_assurance
+      disposition: not_applicable
+      rationale: The preset leaves this capability inactive until its trigger enters scope.
+      reconsider_when:
+        - regulatory_assurance_activation_trigger_enters_scope
+
+  actors:
+    - id: human:owner
+      kind: human
+      name: Accountable owner
+      capabilities: [product_outcomes, requirements, architecture, code_quality, verification, security_privacy, operability_release, documentation_feedback, research_assurance]
+      permission_ceiling: production
+    - id: agent:planner
+      kind: agent
+      name: Planner
+      tier: planner
+      model: claude-opus
+      budget_tokens: 600000
+      capabilities: [product_outcomes, requirements, architecture, code_quality, verification, security_privacy, operability_release, documentation_feedback, research_assurance]
+      permission_ceiling: external_write
+    - id: agent:worker
+      kind: agent
+      name: Worker
+      tier: worker
+      model: claude-sonnet
+      turn_cap: 40
+      budget_tokens: 400000
+      capabilities: [product_outcomes, requirements, architecture, code_quality, verification, security_privacy, operability_release, documentation_feedback, research_assurance]
+      permission_ceiling: local_write
+    - id: agent:exec
+      kind: agent
+      name: Executor
+      tier: executor
+      model: local-27b
+      turn_cap: 20
+      capabilities: [verification]
+      permission_ceiling: local_write
+    - id: automation:ci
+      kind: automation
+      name: Continuous integration
+      capabilities: [verification]
+      permission_ceiling: read_only
+
+  workflow_defaults:
+    research_question: run
+    product_hypothesis: discovery
+    implementation: feature
+    defect: bug_fix
+    publication_or_distribution: release
+
+  risk_defaults:
+    baseline: low
+    externally_published_claim_minimum: high
+    sensitive_dataset_minimum: high
+
+  tailoring:
+    status: confirmed
+    questions:
+      - Which environments and seeds are required for reproducibility?
+      - What evidence authority is required for each class of claim?
+      - Are datasets licensed, sensitive, representative, and versioned?
+      - Which benchmark, model, code, and hardware versions must be retained?
+      - Which steps are consequential here (compute spend above budget, publication, promotion, data rights, destructive)?
+      - Which agent tiers exist (planner, worker, executor), on which models, with which budgets?
+    answers:
+      - question: Which environments and seeds are required for reproducibility?
+        answer: Local and the gpu-cluster; three seeds for any number that is quoted.
+      - question: What evidence authority is required for each class of claim?
+        answer: Internal findings need a results file and receipts; published claims need a gated release.
+      - question: Are datasets licensed, sensitive, representative, and versioned?
+        answer: Research data only, versioned by digest in the results file.
+      - question: Which benchmark, model, code, and hardware versions must be retained?
+        answer: Receipts carry the benchmark bundle digest; the results file names code commit and hardware.
+      - question: Which steps are consequential here (compute spend above budget, publication, promotion, data rights, destructive)?
+        answer: Compute above the per-run token budget, publication, promotion of a model, data-rights questions, and anything destructive. Each goes through a gated workflow.
+      - question: Which agent tiers exist (planner, worker, executor), on which models, with which budgets?
+        answer: Planner (claude-opus), worker (claude-sonnet, 40 turns), executor (local-27b, 20 turns, local_write at most); budgets are under program.budgets.
+    confirmed_by: human:owner
+    confirmed_at: "2026-10-01T08:00:00+00:00"
+
+  policy_refs:
+    - core-risk-policy
+    - core-assurance-policy
+    - core-permission-policy
+    - core-evidence-policy
