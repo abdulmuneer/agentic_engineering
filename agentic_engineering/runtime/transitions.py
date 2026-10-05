@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .authorization import decision_covers
 from .catalog import Catalog, load_catalog, workflow_states, workflow_transitions
+from .contracts import placeholder_free
 from .io import (
     dump_yaml,
     load_record,
@@ -93,6 +95,8 @@ def _auto_guard_satisfied(
         predicate = contract.get("predicate")
         if predicate in {"non_empty", "declared_actor"}:
             return exists and _present(value)
+        if predicate == "non_placeholder":
+            return exists and placeholder_free(value)
         if predicate == "present":
             return exists
         if predicate in {"non_empty_resolved_refs", "resolved_ref"}:
@@ -340,9 +344,10 @@ def transition_project(
             )
     for reference in approval_refs:
         decision = decisions_by_id[reference]
-        if record_id not in decision.get("subject_refs", []):
+        if not decision_covers(decision, record, actor=actor):
             raise TransitionError(
                 f"Decision {reference!r} is not bound to work item {record_id!r}"
+                " and no unexpired standing authorization covers it"
             )
         disposition = decision.get("outcome", {})
         disposition = disposition.get("disposition") if isinstance(disposition, dict) else None

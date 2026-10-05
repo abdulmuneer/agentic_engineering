@@ -15,7 +15,7 @@
 |---|---|
 | `web_product` | The product has a browser or graphical user-facing surface. |
 | `cli_tool` | The main product surface is a command-line or operator workflow. |
-| `research_platform` | The product centers on experiments, scientific claims, or reproducibility. |
+| `research_platform` | The product centers on experiments, scientific claims, or reproducibility. Defaults to low risk and the lean `run` workflow. |
 | `regulated_service` | Regulated data, compliance, or controlled production operation is central. |
 
 Choose the closest preset and tailor it. Do not create a new preset for a
@@ -47,6 +47,12 @@ Edit `<product-root>/.agentic/program.yaml` and verify:
 6. Every actor declares its kind, capabilities, and least-privilege ceiling.
 7. Domain-specific actors provide catalog capabilities rather than bypassing
    them with job-title prose.
+8. Every agent actor has a `tier` (planner, worker, executor), its `model`, and a
+   `budget_tokens`; bounded workers have a `turn_cap`. Executors stay at
+   `local_write` and own or review no capability.
+9. `budgets` and shared `resources` (owner, capacity, rule) are declared.
+10. The consequential steps for this project are listed in a tailoring answer, and
+    repeated ones have a proposed standing authorization for the human to approve.
 
 Persist answers as a list and copy each question exactly:
 
@@ -73,4 +79,5 @@ agentic validate <product-root> --strict
 
 Bootstrap is complete only when strict validation has zero errors and warnings,
 the generated operating model matches canonical state, and the first bounded
-discovery or delivery item is identified.
+run, discovery or delivery item is identified. Keep bootstrap short: it is
+paid for again by every agent that later reads its records.

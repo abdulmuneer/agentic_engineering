@@ -16,7 +16,7 @@ from .initialization import (
     update_source_pin,
     upgrade_project,
 )
-from .io import load_record, load_yaml, locate_overlay
+from .io import dump_yaml, load_record, load_yaml, locate_overlay
 from .rendering import render_project
 from .records import (
     CONTEXT_KINDS,
@@ -31,6 +31,7 @@ from .records import (
     create_work_packet,
 )
 from .routing import route_record
+from .status import status_lines
 from .transitions import TransitionError, find_work_record, transition_project
 from .validation import render_report, validate_framework, validate_project
 
@@ -82,6 +83,12 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Return failure when warnings are present as well as errors",
     )
+    validate.add_argument(
+        "--max-issues",
+        type=int,
+        metavar="N",
+        help="Print at most N issues (errors first) plus a count of the rest",
+    )
 
     validate_framework_parser = subparsers.add_parser(
         "validate-framework", help="Validate the reusable catalogs, workflows, roles, and schemas"
@@ -89,12 +96,24 @@ def _parser() -> argparse.ArgumentParser:
     validate_framework_parser.add_argument("root", nargs="?", default="agentic_engineering")
     validate_framework_parser.add_argument("--json", action="store_true")
     validate_framework_parser.add_argument("--strict", action="store_true")
+    validate_framework_parser.add_argument("--max-issues", type=int, metavar="N")
+
+    status = subparsers.add_parser(
+        "status", help="One terse line per work item, standing authorization, and revisit date"
+    )
+    status.add_argument("root", nargs="?", default=".")
+    status.add_argument("--framework-root")
 
     route = subparsers.add_parser("route", help="Compute controls for a work record")
     route.add_argument("item")
     route.add_argument("--root", default=".")
     route.add_argument("--framework-root")
     route.add_argument("--json", action="store_true")
+    route.add_argument(
+        "--write",
+        action="store_true",
+        help="Write the computed risk, assurance, rules, capabilities and permissions into the YAML work item",
+    )
 
     new_work = subparsers.add_parser("new-work", help="Create a schema-backed draft work item")
     new_work.add_argument("item")
@@ -168,6 +187,18 @@ def _parser() -> argparse.ArgumentParser:
     new_decision.add_argument("--authorize-actor", action="append", default=[])
     new_decision.add_argument("--action-scope")
     new_decision.add_argument("--authorization-expires-at")
+    new_decision.add_argument(
+        "--standing",
+        action="store_true",
+        help="Make the authorization a standing yes for every work item matched by --applies-to",
+    )
+    new_decision.add_argument(
+        "--applies-to",
+        action="append",
+        default=[],
+        metavar="ID",
+        help="Work item id, workflow id, or * (with --standing)",
+    )
     new_decision.add_argument("--source-path")
     new_decision.add_argument("--source-version")
     new_decision.add_argument("--source-sha256")
@@ -237,6 +268,27 @@ def _parser() -> argparse.ArgumentParser:
     upgrade.add_argument("--framework-root")
     upgrade.add_argument("--apply", action="store_true")
     return parser
+
+
+def _write_route(path: Path, data: dict[str, object]) -> None:
+    if path.suffix != ".yaml":
+        raise ValueError(f"--write supports canonical YAML work items only: {path}")
+    document = load_yaml(path)
+    work = document.get("work_item")
+    if not isinstance(work, dict):
+        raise ValueError(f"Not a work item record: {path}")
+    risk = work.setdefault("risk", {})
+    risk["effective_tier"] = data["effective_risk"]
+    risk["assurance_level"] = data["minimum_assurance"]
+    risk["rule_refs"] = list(data["matched_rules"])
+    for field, key in (
+        ("required_capabilities", "required_capabilities"),
+        ("permission_classes", "permissions"),
+    ):
+        existing = [item for item in work.get(field, []) if isinstance(item, str)]
+        computed = [item for item in data[key] if isinstance(item, str)]
+        work[field] = list(dict.fromkeys([*existing, *computed]))
+    path.write_text(dump_yaml(document), encoding="utf-8")
 
 
 def _print_route(data: dict[str, object]) -> None:
@@ -313,13 +365,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                 Path(args.root),
                 framework=_path(args.framework_root),
             )
-            print(render_report(report, as_json=args.json))
+            print(render_report(report, as_json=args.json, max_issues=args.max_issues))
             return 1 if not report.ok or (args.strict and report.warnings) else 0
 
         if args.command == "validate-framework":
             report = validate_framework(Path(args.root))
-            print(render_report(report, as_json=args.json))
+            print(render_report(report, as_json=args.json, max_issues=args.max_issues))
             return 1 if not report.ok or (args.strict and report.warnings) else 0
+
+        if args.command == "status":
+            for line in status_lines(Path(args.root), framework=_path(args.framework_root)):
+                print(line)
+            return 0
 
         if args.command == "route":
             _, overlay = locate_overlay(Path(args.root))
@@ -344,6 +401,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             data = route_record(record, catalog).as_dict()
             data["item"] = args.item
             data["record"] = str(path)
+            if args.write:
+                _write_route(path, data)
             if args.json:
                 print(json.dumps(data, indent=2, sort_keys=True))
             else:
@@ -415,6 +474,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 authorize_actors=args.authorize_actor,
                 action_scope=args.action_scope,
                 authorization_expires_at=args.authorization_expires_at,
+                standing=args.standing,
+                applies_to=args.applies_to,
                 source_update_path=args.source_path,
                 source_update_version=args.source_version,
                 source_update_sha256=args.source_sha256,

@@ -2,7 +2,7 @@
 
 This workspace defines a practical operating model for taking a software idea from initial concept to production deployment using a responsible minimum team structure and bounded agentic workflows.
 
-The goal is to make the work repeatable and reviewable: every idea should move through clear ownership, review gates, delivery planning, implementation, testing, deployment, monitoring, and learning. When agents are used, their work should arrive as bounded work packets with context, evidence, risks, and human approval gates.
+The goal is to make the work repeatable and reviewable without making it slow. Ownership is always clear. Low- and medium-risk research and engineering run in a lean loop that closes with results and receipts; high-risk delivery moves through review gates, delivery planning, testing, deployment, monitoring, and learning. Agents are trusted with judgment according to their tier, and human approval is reserved for consequential steps. See `agentic/lessons_from_practice.md` for why.
 
 ## What This Repository Contains
 
@@ -14,8 +14,8 @@ The goal is to make the work repeatable and reviewable: every idea should move t
 | `runtime` | Vendor-neutral CLI for initialization, routing, transition checks, validation, and generated views. |
 | `templates/overlay` | The `.agentic/` control-plane template installed beside product source. |
 | `examples` | Valid and deliberately invalid reference instances, including Fornax. |
-| `team` | Defines the 12 default role lenses and the capabilities they provide. |
-| `agentic` | Defines agentic loops, work packets, permission classes, cadence controls, skill promotion, and eval tracking. |
+| `team` | Defines the 12 default role lenses for gated delivery and the capabilities they provide. |
+| `agentic` | Defines lessons from practice, agent tiers, loops, permission classes and standing authorizations, budgets, work packets, skill promotion, and eval tracking. |
 | `program` | Contains legacy/manual tracker templates, program documents, and sprint records. |
 | `external_knowledge` | Read-only reference material such as domain knowledge, coding snippets, examples, prior art, and external references. |
 | `output` | Stores the actual work produced by the program, including source repositories, documentation, deliverables, and release packages. |
@@ -57,13 +57,14 @@ In the agentic version of this package, roles are lenses and gates, not necessar
 
 ## Agentic Operating Model
 
-Agentic work follows five rules:
+Agentic work follows six rules:
 
-1. Start with a clear outcome and acceptance evidence.
-2. Choose an appropriate loop from `agentic/loop_library.md`.
-3. Scope tools and permissions using `agentic/permission_model.md`.
-4. Return work as a reviewable packet using `agentic/work_packet_template.md`.
-5. Convert repeated lessons into tests, skills, evals, documentation, or process changes.
+1. Start with a clear outcome, the reason it exists, and the bar fixed before the read.
+2. Give it to the right tier (`agentic/agent_tiers.md`) with a budget (`agentic/cadence_controls.md`).
+3. Choose the lean run loop or a gated loop from `agentic/loop_library.md` by routed risk.
+4. Gate only consequential steps, with a decision or standing authorization (`agentic/permission_model.md`).
+5. Close lean runs with results, receipts and the claims not established; return gated work and executor tickets as packets (`agentic/work_packet_template.md`).
+6. Convert repeated lessons into tests, skills, evals, hooks, or rules, and retire guidance that no longer pays.
 
 The CLI makes these rules enforceable:
 

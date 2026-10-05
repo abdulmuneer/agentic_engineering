@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-from .catalog import Catalog
+from .catalog import Catalog, is_ledger
 
 
 DEFAULT_RISK_ORDER = ["low", "medium", "high", "critical"]
@@ -449,7 +449,6 @@ def route_record(record: dict[str, Any], catalog: Catalog) -> Route:
     if facts["research"]:
         required_capabilities.update({"research_assurance", "verification"})
         required_evidence.update({"experiment_result", "review"})
-        force_fact("FACT-RESEARCH", "medium")
     if facts["destructive"]:
         required_capabilities.update(
             {"architecture", "backend_delivery", "operability_release", "verification"}
@@ -496,6 +495,10 @@ def route_record(record: dict[str, Any], catalog: Catalog) -> Route:
         required_evidence.update(_strings(rule.get("required_evidence", rule.get("evidence"))))
         permissions.update(_strings(rule.get("permissions")))
         matched.append(str(rule.get("id", f"rule-{index}")))
+
+    if is_ledger(workflow):
+        # Ledger workflows record results by reference; routed evidence must not block them.
+        required_evidence = set()
 
     computed = max_tier(candidate_tiers, order)
     effective = computed

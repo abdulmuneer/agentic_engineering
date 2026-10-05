@@ -16,7 +16,7 @@ from .io import (
     record_files,
     sha256_file,
 )
-from .catalog import framework_fingerprint, load_catalog
+from .catalog import framework_fingerprint, is_ledger, load_catalog
 from .rendering import render_project
 from .routing import assurance_rank, minimum_assurance, risk_order, route_record
 
@@ -153,7 +153,7 @@ def init_project(
         profile_defaults = {}
     profile = {
         "product_type": profile_defaults.get("product_type", preset.get("id", preset_name)),
-        "lifecycle_phase": "discovery",
+        "lifecycle_phase": profile_defaults.get("lifecycle_phase", "discovery"),
         "surfaces": profile_defaults.get("surfaces", []),
         "deployment_targets": profile_defaults.get("deployment_targets", []),
         "data_classes": profile_defaults.get("data_classes", []),
@@ -541,6 +541,7 @@ def create_work_item(
         work_type = {
             "discovery": "discovery",
             "research_spike": "research",
+            "run": "research",
             "bug_fix": "bug",
             "incident": "incident",
             "release": "release",
@@ -697,7 +698,10 @@ def create_work_item(
         "assurance_level": assurance,
         "rule_refs": list(routed.matched_rules),
     }
-    for plan in payload["evidence_plan"]:
+    if is_ledger(workflow):
+        # Ledger work records results by reference; it carries no evidence plan.
+        payload.pop("evidence_plan", None)
+    for plan in payload.get("evidence_plan", []):
         plan["kinds"] = list(routed.required_evidence)
         plan["minimum_assurance"] = assurance
     output = overlay / "records" / "work_items" / f"{work_id}.yaml"

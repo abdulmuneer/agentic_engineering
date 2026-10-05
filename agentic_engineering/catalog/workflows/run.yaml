@@ -1,0 +1,31 @@
+schema_version: 1
+framework_version: 0.1.0
+workflow:
+  id: run
+  description: >-
+    Lean ledger for a bounded run (experiment, evaluation, data job) at low or medium risk.
+    Results are recorded by reference; no work packets, evidence records, or assurance receipts
+    gate it. Consequential work belongs in a gated workflow.
+  applies_to: [research_run, experiment, evaluation, data_job, benchmark_run]
+  record_mode: ledger
+  initial_state: draft
+  terminal_states: [closed, stopped, cancelled]
+  assurance_states: []
+  guard_contracts:
+    objective_defined: {path: objective, predicate: non_placeholder}
+    acceptance_defined: {path: acceptance, predicate: non_placeholder}
+    accountable_human_named: {path: accountable_human, predicate: declared_actor}
+    results_recorded: {path: results.ref, predicate: non_empty}
+    not_established_recorded: {path: results.not_established, predicate: non_empty}
+    stop_reason_recorded: {path: results.stop_reason, predicate: non_empty}
+    partial_findings_recorded: {path: results.ref, predicate: non_empty}
+  states:
+    draft:
+      transitions:
+        start: {to: running, guards: [objective_defined, acceptance_defined, accountable_human_named]}
+        cancel: {to: cancelled, guards: [stop_reason_recorded]}
+    running:
+      transitions:
+        close: {to: closed, guards: [results_recorded, not_established_recorded]}
+        stop: {to: stopped, guards: [stop_reason_recorded, partial_findings_recorded]}
+        cancel: {to: cancelled, guards: [stop_reason_recorded]}

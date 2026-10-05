@@ -1,0 +1,83 @@
+schema_version: 1
+framework_version: 0.1.0
+
+work_item:
+  id: RUN-0001
+  title: Evaluate the baseline on the held-out benchmark
+  type: research
+  workflow: run
+  state:
+    current: closed
+    history:
+      - sequence: 1
+        event: create
+        from: null
+        to: draft
+        at: "2026-10-02T09:00:00Z"
+        actor: human:owner
+        guard_refs: []
+        confirmed_guard_refs: []
+      - sequence: 2
+        event: transition_to_running
+        from: draft
+        to: running
+        at: "2026-10-02T09:10:00Z"
+        actor: agent:planner
+        guard_refs: [objective_defined, acceptance_defined, accountable_human_named]
+        confirmed_guard_refs: []
+      - sequence: 3
+        event: transition_to_closed
+        from: running
+        to: closed
+        at: "2026-10-03T16:00:00Z"
+        actor: agent:planner
+        guard_refs: [results_recorded, not_established_recorded]
+        confirmed_guard_refs: []
+  source_refs:
+    - program:lean-research
+  source_revision: "1"
+  objective: Measure the baseline error rate on the held-out benchmark with three seeds.
+  accountable_human: human:owner
+  required_capabilities:
+    - code_quality
+    - requirements
+    - research_assurance
+    - verification
+  change:
+    surfaces: [experiment]
+    production_affecting: false
+    authentication: false
+    authorization: false
+    sensitive_data: false
+    safety_impact: none
+    regulated_impact: false
+    destructive_migration: false
+    external_write: false
+    reversibility: easy
+    blast_radius: local
+  risk:
+    declared_tier: low
+    effective_tier: low
+    assurance_level: A0
+    rule_refs: []
+  route: run
+  acceptance:
+    - id: AC-RUN-0001-1
+      statement: A results file reports the baseline error rate for three seeds and names the code commit.
+  permission_classes: [local_write]
+  decision_refs: [DEC-RESUME-AFTER-CHECKPOINT]
+  budget:
+    tokens: 500000
+    model_tier: worker
+  results:
+    ref: runs/RUN-0001/results.md
+    receipts:
+      - uri: gs://example-research-bucket/runs/RUN-0001/eval_bundle.tar
+        sha256: 9c512ff11f505b97bea55a5460479c30208e73a86b0b5f8702304822633ffc1b
+        kind: eval_bundle
+      - uri: gs://example-research-bucket/runs/RUN-0001/metrics.json
+        sha256: d860fb5d7d5786994653ce5e02c545ac522880e01b29f1cfe87c2b3c0fcbafa7
+        kind: metrics
+    not_established:
+      - Whether the error rate holds on out-of-domain audio.
+      - Whether the three-seed spread is representative of a larger sample.

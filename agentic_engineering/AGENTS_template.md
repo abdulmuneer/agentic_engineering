@@ -8,17 +8,16 @@ This file is a reusable handbook. In an initialized product repository, `.agenti
 
 Before substantive work:
 
-1. Run `agentic validate .` and resolve source, capability, or generated-view drift.
-2. Route the work item with `agentic route <ID> --root .`.
-3. Use the selected workflow from `catalog/workflows`, not the entire lifecycle as a mandatory sequence.
-4. Respect the calculated risk tier, assurance level, permission ceiling, and evidence plan.
+1. Run `agentic status .` for the current items, open human gates and standing authorizations; run `agentic validate . --max-issues 20` when something looks wrong.
+2. Route the work item with `agentic route <ID> --root .`. Low- and medium-risk research and bounded engineering use the lean `run` workflow; high- and critical-risk work, releases and incidents use a gated workflow.
+3. Respect the calculated risk tier, your actor tier, the permission ceiling, and the budget.
 
 ## Folder Structure
 
 | Folder | Purpose |
 |---|---|
-| `team` | Role definitions and responsibilities for the 12-person responsible minimum team. |
-| `agentic` | Agentic operating controls: loop library, permission model, work packet template, cadence controls, skill registry, and eval registry. |
+| `team` | Role lenses for gated delivery work. They are perspectives, not headcount; research presets use a subset. |
+| `agentic` | Agentic operating controls: lessons from practice, agent tiers, loop library, permission model, cadence and budgets, work packet template, skill registry, and eval registry. |
 | `program` | Program-level trackers, global program documents, and sprint records. |
 | `program/trackers` | Reusable and active trackers for intake, requirements, backlog, delivery, release, risks, decisions, metrics, and reporting. |
 | `program/program_documents` | Global planning, program charter, governance, stakeholder context, and other non-sprint program documentation. |
@@ -48,16 +47,19 @@ Roles are used as lenses and gates. They may be staffed by humans, supported by 
 
 ## Agentic Operating Rules
 
-Use agents when they improve throughput without weakening evidence, reviewability, or accountability.
+Judgment is delegated; consequences are verified.
 
-1. **Bound the loop.** Pick a loop from `agentic/loop_library.md` before starting agent work.
-2. **Scope permissions.** Classify the task using `agentic/permission_model.md`; require human approval for destructive, external, sensitive, or production-affecting actions.
-3. **Limit work in progress.** Apply `agentic/cadence_controls.md` so agents do not outrun human review capacity.
-4. **Return a work packet.** Every agent-assisted implementation, review, research, or release task should produce the fields in `agentic/work_packet_template.md`.
-5. **Review evidence, not confidence.** Humans should inspect changed files, tests run, skipped checks, assumptions, and residual risks.
-6. **Compound learning.** Repeated successful patterns should be promoted into `agentic/skill_registry.md`, `agentic/eval_registry.md`, tests, runbooks, or process updates.
+1. **Know your tier.** Planners decide within written rules and standing authorizations; workers finish bounded tasks and report; executors follow tickets and stop on anything unspecified. See `agentic/agent_tiers.md`.
+2. **Gate on consequence.** Local, reversible work needs no approval and no record. Compute above budget, publication, promotion, data rights, destructive and production actions need a decision or a standing authorization. See `agentic/permission_model.md`.
+3. **Keep one ledger.** For a lean run: README (why, recipe, pinned inputs, bar fixed before the read, consequential steps, budget), status (four header lines, at most three lines per entry), results (numbers, receipts, claims not established). Do not keep a parallel journal.
+4. **Point to receipts.** Tools emit launch receipts, checksums and readbacks; records reference them. Do not paste logs or write evidence files per step.
+5. **Verify where it matters.** Use a gold set, a readback or a bar fixed before the read at the point where being wrong would cost something, and make the bar cover every claim the result makes.
+6. **Spend budgets deliberately.** Human attention goes to decisions only. Use the cheapest tier that can do the task. Message peers only for decisions, hand-overs and failures. See `agentic/cadence_controls.md`.
+7. **Compound and prune learning.** Promote repeated lessons into skills, tests and hooks; retire superseded guidance instead of stacking it.
 
 ## End-To-End Operating Process
+
+The full lifecycle below applies to gated work: high- and critical-risk delivery, releases and incidents. Lean runs follow the run loop in `agentic/loop_library.md` and skip the stages they do not need.
 
 The following stages are a coverage map. Discovery, research spikes, features, bug fixes, incidents, and releases use different state machines. A project may omit or defer capabilities only through the dispositions recorded in its program manifest.
 

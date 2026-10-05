@@ -1,0 +1,32 @@
+schema_version: 1
+framework_version: 0.1.0
+
+decision:
+  id: DEC-RESUME-AFTER-CHECKPOINT
+  type: delivery
+  title: Standing yes to resume a paused run from its latest checkpoint
+  subject_refs: [lean-research]
+  options:
+    - id: standing-yes
+      summary: The planner may resume any paused run from its latest checkpoint without asking again.
+      tradeoffs: [A resumed run spends compute inside the per-run budget, No new data or publication is covered]
+    - id: ask-each-time
+      summary: Ask the accountable human at every resume.
+      tradeoffs: [Idle nodes wait on a human for a routine action]
+  outcome:
+    disposition: approve
+    selected_option_ref: standing-yes
+  rationale: Resuming from a checkpoint is routine, reversible, and bounded by the per-run token budget; waiting for a human idles the cluster.
+  owner: human:owner
+  reviewers: []
+  evidence_refs: []
+  guard_authorizations: [permissions_satisfied]
+  decided_at: "2026-10-01T09:00:00Z"
+  revisit_at: "2026-12-01T00:00:00Z"
+  authorization:
+    permission_classes: [external_write]
+    actor_refs: [agent:planner]
+    action_scope: Resume a paused run from its latest checkpoint on the gpu-cluster resource; no new data, no publication.
+    expires_at: "2027-01-01T00:00:00Z"
+    standing: true
+    applies_to: [run]

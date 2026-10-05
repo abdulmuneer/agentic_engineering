@@ -113,7 +113,21 @@
             }
           ]
         },
-        "policy_refs": {"$ref": "#/$defs/stringSet"}
+        "policy_refs": {"$ref": "#/$defs/stringSet"},
+        "budgets": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "per_run_tokens": {"type": "integer", "minimum": 0},
+            "context_tokens": {"type": "integer", "minimum": 0},
+            "coordination": {"type": "string", "minLength": 1},
+            "human_review_minutes_per_day": {"type": "integer", "minimum": 0}
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/resource"}
+        }
       }
     }
   },
@@ -164,6 +178,18 @@
         {"if": {"properties": {"disposition": {"const": "waived"}}, "required": ["disposition"]}, "then": {"required": ["rationale", "waiver"]}}
       ]
     },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "owner"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "owner": {"$ref": "#/$defs/id"},
+        "capacity": {"type": ["string", "number"]},
+        "unit": {"type": "string", "minLength": 1},
+        "rule": {"type": "string", "minLength": 1}
+      }
+    },
     "actor": {
       "type": "object",
       "additionalProperties": false,
@@ -174,8 +200,18 @@
         "name": {"type": "string", "minLength": 1},
         "capabilities": {"$ref": "#/$defs/stringSet"},
         "permission_ceiling": {"enum": ["read_only", "local_write", "external_read", "external_write", "sensitive", "production"]},
-        "specialist_domains": {"$ref": "#/$defs/stringSet"}
-      }
+        "specialist_domains": {"$ref": "#/$defs/stringSet"},
+        "tier": {"enum": ["planner", "worker", "executor"]},
+        "model": {"type": "string", "minLength": 1},
+        "turn_cap": {"type": "integer", "minimum": 1},
+        "budget_tokens": {"type": "integer", "minimum": 0}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "human"}}, "required": ["kind"]},
+          "then": {"not": {"required": ["tier"]}}
+        }
+      ]
     }
   }
 }

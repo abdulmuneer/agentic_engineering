@@ -32,7 +32,9 @@
         "action_scope": {"type": "string", "minLength": 1},
         "rationale": {"type": "string", "minLength": 1},
         "owner": {"$ref": "#/$defs/id"},
-        "risk_acceptance_ref": {"$ref": "#/$defs/id"}
+        "risk_acceptance_ref": {"$ref": "#/$defs/id"},
+        "independence": {"$ref": "#/$defs/independence"},
+        "coverage": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
       },
       "allOf": [
         {"if": {"properties": {"result": {"enum": ["not_run", "inconclusive"]}}, "required": ["result"]}, "then": {"required": ["rationale", "owner", "risk_acceptance_ref"]}},
@@ -42,6 +44,16 @@
   },
   "$defs": {
     "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"},
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["gold_set", "readback", "preregistered_bar", "second_reader", "deterministic_check"]},
+        "ref": {"type": "string", "minLength": 1},
+        "fixed_before_read": {"type": "boolean"}
+      }
+    },
     "digest": {"type": "string", "pattern": "^sha256:[A-Fa-f0-9]{64}$"},
     "subject": {
       "type": "object",

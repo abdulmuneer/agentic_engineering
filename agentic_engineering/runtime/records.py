@@ -629,6 +629,8 @@ def create_decision(
     authorize_actors: list[str] | None = None,
     action_scope: str | None = None,
     authorization_expires_at: str | None = None,
+    standing: bool = False,
+    applies_to: list[str] | None = None,
     source_update_path: str | None = None,
     source_update_version: str | None = None,
     source_update_sha256: str | None = None,
@@ -661,6 +663,9 @@ def create_decision(
             continue
         if subject in context.catalog.capabilities:
             subjects.append(("capability", None, context.catalog.capabilities[subject]))
+            continue
+        if subject in context.catalog.workflows and subject not in index:
+            subjects.append(("workflow", None, context.catalog.workflows[subject]))
             continue
         entry = index.get(subject)
         if entry is None:
@@ -731,6 +736,16 @@ def create_decision(
             "action_scope": action_scope,
             "expires_at": authorization_expires_at,
         }
+        if standing:
+            targets = list(dict.fromkeys(applies_to or []))
+            if not targets:
+                raise ValueError("A standing authorization requires --applies-to")
+            if outcome not in {"approve", "go", "commit", "accept_risk"}:
+                raise ValueError("A standing authorization requires an approving outcome")
+            decision["authorization"]["standing"] = True
+            decision["authorization"]["applies_to"] = targets
+    elif standing or applies_to:
+        raise ValueError("--standing and --applies-to need an authorization to attach to")
 
     source_update_values = (
         source_update_path,

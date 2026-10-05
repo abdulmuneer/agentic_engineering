@@ -8,13 +8,23 @@ from typing import Any
 
 from agentic_engineering import __version__
 
+from .authorization import (
+    APPROVING_DISPOSITIONS,
+    authorization_of,
+    decision_covers,
+    is_standing,
+    standing_expired,
+)
 from .catalog import (
+    RECORD_MODES,
     Catalog,
     framework_fingerprint,
+    is_ledger,
     load_catalog,
     workflow_states,
     workflow_transitions,
 )
+from .contracts import placeholder_free
 from .io import (
     load_record,
     load_yaml,
@@ -113,6 +123,16 @@ def _present(value: Any) -> bool:
     if isinstance(value, (list, dict, tuple, set)):
         return bool(value)
     return value is not None
+
+
+def _dotted(data: dict[str, Any], path: str) -> Any:
+    """Resolve a dotted field path on a record; missing fields read as None."""
+    current: Any = data
+    for part in path.split("."):
+        if not isinstance(current, dict) or part not in current:
+            return None
+        current = current[part]
+    return current
 
 
 def _validate_json_schema_if_available(
@@ -574,6 +594,8 @@ def _validate_actors(
                 manifest_path,
             )
 
+    _validate_actor_tiers(program, actors, catalog, manifest_path, report)
+    _validate_budgets_and_resources(payload, actors, manifest_path, report)
     accountable = payload.get("accountable_human")
     accountable_actor = actors.get(accountable) if isinstance(accountable, str) else None
     if accountable_actor is None or accountable_actor.get("kind") != "human":
@@ -633,6 +655,116 @@ def _validate_actors(
                     )
 
 
+ACTOR_TIERS = ("planner", "worker", "executor")
+
+
+def _is_count(value: Any, *, minimum: int) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= minimum
+
+
+def _validate_actor_tiers(
+    program: dict[str, Any],
+    actors: dict[str, dict[str, Any]],
+    catalog: Catalog,
+    manifest_path: Path,
+    report: ValidationReport,
+) -> None:
+    order = permission_order(catalog)
+    for actor_id, actor in actors.items():
+        if "tier" in actor:
+            if actor["tier"] not in ACTOR_TIERS:
+                report.add(
+                    "error",
+                    "actor-tier",
+                    f"Actor {actor_id!r} has unknown tier {actor['tier']!r}; use one of "
+                    + ", ".join(ACTOR_TIERS),
+                    manifest_path,
+                )
+            if actor.get("kind") != "agent":
+                report.add(
+                    "error",
+                    "actor-tier-kind",
+                    f"Actor {actor_id!r} is {actor.get('kind')!r}; tier applies to agents only",
+                    manifest_path,
+                )
+        if "model" in actor and not _present(actor["model"]):
+            report.add("error", "actor-model", f"Actor {actor_id!r} has an empty model", manifest_path)
+        for key, minimum in (("turn_cap", 1), ("budget_tokens", 0)):
+            if key in actor and not _is_count(actor[key], minimum=minimum):
+                report.add(
+                    "error",
+                    "actor-budget",
+                    f"Actor {actor_id!r} {key} must be an integer of at least {minimum}",
+                    manifest_path,
+                )
+    executors = {actor_id for actor_id, actor in actors.items() if actor.get("tier") == "executor"}
+    for actor_id in sorted(executors):
+        ceiling = actors[actor_id].get("permission_ceiling")
+        if ceiling in order and order.index(ceiling) > order.index("local_write"):
+            report.add(
+                "error",
+                "executor-permission-ceiling",
+                f"Executor-tier actor {actor_id!r} has ceiling {ceiling!r}; it may not exceed local_write",
+                manifest_path,
+            )
+    for capability_id, assignment in _program_capabilities(program).items():
+        holders = {principal_id(assignment.get("owner"))} | set(_strings(assignment.get("reviewers")))
+        for actor_id in sorted(holders & executors):
+            report.add(
+                "error",
+                "executor-capability-role",
+                f"Executor-tier actor {actor_id!r} may not own or review capability {capability_id!r}",
+                manifest_path,
+            )
+
+
+def _validate_budgets_and_resources(
+    payload: dict[str, Any],
+    actors: dict[str, dict[str, Any]],
+    manifest_path: Path,
+    report: ValidationReport,
+) -> None:
+    budgets = payload.get("budgets")
+    if isinstance(budgets, dict):
+        for key in ("per_run_tokens", "context_tokens", "human_review_minutes_per_day"):
+            if key in budgets and not _is_count(budgets[key], minimum=0):
+                report.add(
+                    "error",
+                    "program-budget",
+                    f"program.budgets.{key} must be a non-negative integer",
+                    manifest_path,
+                )
+        if "coordination" in budgets and not _present(budgets["coordination"]):
+            report.add(
+                "error", "program-budget", "program.budgets.coordination must be rule text", manifest_path
+            )
+    elif budgets is not None:
+        report.add("error", "program-budget", "program.budgets must be a mapping", manifest_path)
+    resources = payload.get("resources")
+    if resources is None:
+        return
+    if not isinstance(resources, list):
+        report.add("error", "program-resources", "program.resources must be a list", manifest_path)
+        return
+    seen: set[str] = set()
+    for resource in resources:
+        resource_id = resource.get("id") if isinstance(resource, dict) else None
+        if not isinstance(resource_id, str) or not resource_id:
+            report.add("error", "resource-id", "Every resource needs an id", manifest_path)
+            continue
+        if resource_id in seen:
+            report.add("error", "resource-duplicate", f"Duplicate resource {resource_id!r}", manifest_path)
+        seen.add(resource_id)
+        owner = principal_id(resource.get("owner"))
+        if owner not in actors:
+            report.add(
+                "error",
+                "resource-owner",
+                f"Resource {resource_id!r} owner {owner!r} is not a declared actor",
+                manifest_path,
+            )
+
+
 def _resolve_evidence_reference(path: Path, value: str, overlay: Path, evidence_ids: set[str]) -> bool:
     if value in evidence_ids:
         return True
@@ -670,8 +802,11 @@ def _review_reached(record: dict[str, Any], workflow: dict[str, Any] | None = No
     state = _record_state(record)
     if not isinstance(state, str):
         return True
-    assurance_states = _strings((workflow or {}).get("assurance_states"))
-    return state in (set(assurance_states) if assurance_states else REVIEW_STATES)
+    declared = (workflow or {}).get("assurance_states")
+    if isinstance(declared, list):
+        # An explicit list is authoritative, including [] for workflows with no assurance states.
+        return state in set(_strings(declared))
+    return state in REVIEW_STATES
 
 
 def _validate_transition_history(
@@ -810,10 +945,8 @@ def _validate_transition_history(
             )
         for reference in sorted(event_approvals & decision_ids):
             decision = decision_records.get(reference, {})
-            if (
-                _decision_disposition(decision)
-                not in {"approve", "go", "commit", "accept_risk"}
-                or record.get("id") not in _strings(decision.get("subject_refs"))
+            if _decision_disposition(decision) not in APPROVING_DISPOSITIONS or not decision_covers(
+                decision, record, actor=actor if isinstance(actor, str) else None, at=event_at
             ):
                 report.add(
                     "error",
@@ -888,6 +1021,8 @@ def _validate_transition_history(
                     if "equals" in contract
                     else _present(value)
                     if predicate in {"non_empty", "declared_actor"}
+                    else placeholder_free(value)
+                    if predicate == "non_placeholder"
                     else value is not None
                     if predicate == "present"
                     else True
@@ -1120,8 +1255,10 @@ def _validate_assurance(
     )
     if isinstance(declared_assurance, dict):
         declared_assurance = declared_assurance.get("level")
-    if declared_assurance is not None and assurance_rank(declared_assurance) < assurance_rank(
-        route.minimum_assurance
+    if (
+        declared_assurance is not None
+        and not is_ledger(workflow)
+        and assurance_rank(declared_assurance) < assurance_rank(route.minimum_assurance)
     ):
         report.add(
             "error",
@@ -1138,7 +1275,7 @@ def _validate_assurance(
     validator = principal_id(record.get("validator") or record.get("reviewer"))
     approver = principal_id(record.get("approver") or record.get("accountable_human"))
     minimum_rank = assurance_rank(route.minimum_assurance)
-    review_reached = _review_reached(record, workflow)
+    review_reached = _review_reached(record, workflow) and not is_ledger(workflow)
     if require_actor_separation and review_reached and minimum_rank >= 1:
         review_receipts = _strings(record.get("review_refs"))
         if not review_receipts and not validator:
@@ -1235,6 +1372,24 @@ def _evidence_subject_matches_packet(
         return any(item.get("kind") == "commit" and item.get("ref") == commit for item in outputs)
     release_ref = subject.get("release_ref")
     return isinstance(release_ref, str) and release_ref in output_refs
+
+
+INDEPENDENT_KINDS = {"gold_set", "readback", "preregistered_bar"}
+
+
+def _independent_evidence(evidence: dict[str, Any]) -> bool:
+    """Evidence bound to an artifact fixed outside the producing run counts as independent.
+
+    A gold set, a readback, or a bar fixed before the read stands in for a distinct run, actor and
+    context. It needs a ref to that artifact; a bare assertion does not count. Human acceptance and
+    A3 specialist review are separate requirements and are not affected.
+    """
+    independence = evidence.get("independence")
+    if not isinstance(independence, dict) or independence.get("kind") not in INDEPENDENT_KINDS:
+        return False
+    if not _present(independence.get("ref")):
+        return False
+    return independence["kind"] != "preregistered_bar" or independence.get("fixed_before_read") is True
 
 
 def _decision_disposition(record: dict[str, Any]) -> str | None:
@@ -1466,7 +1621,32 @@ def _validate_records(
                 if isinstance(risk_defaults.get("baseline"), str):
                     record["_baseline_risk"] = risk_defaults["baseline"]
             route = route_record(record, catalog)
+            record_workflow = catalog.workflows.get(_record_workflow_id(record) or "", {})
+            ledger = is_ledger(record_workflow)
             if kind == "work":
+                if ledger:
+                    risk_details = record.get("risk") if isinstance(record.get("risk"), dict) else {}
+                    tiers = {route.effective_risk, risk_details.get("effective_tier")}
+                    if tiers & {"high", "critical"}:
+                        report.add(
+                            "error",
+                            "ledger-consequential-risk",
+                            "Consequential work (effective risk high or critical) needs a gated "
+                            "workflow (release, feature, or similar), not a ledger workflow"
+                            + (
+                                f" (matched rules: {', '.join(route.matched_rules)})"
+                                if route.matched_rules
+                                else ""
+                            ),
+                            path,
+                        )
+                elif "evidence_plan" not in record:
+                    report.add(
+                        "error",
+                        "evidence-plan-missing",
+                        "Gated work items need an evidence_plan",
+                        path,
+                    )
                 accountable = principal_id(record.get("accountable_human"))
                 if accountable not in actor_ids or actors_by_id.get(accountable or "", {}).get("kind") != "human":
                     report.add(
@@ -1504,7 +1684,7 @@ def _validate_records(
                     if isinstance(record.get("risk"), dict)
                     else None
                 )
-                for plan in record.get("evidence_plan", []):
+                for plan in [] if ledger else record.get("evidence_plan", []):
                     if isinstance(plan, dict) and assurance_rank(
                         plan.get("minimum_assurance")
                     ) < assurance_rank(work_assurance):
@@ -1521,7 +1701,9 @@ def _validate_records(
                         f"Evidence plan references unknown acceptance criterion {acceptance_ref!r}",
                         path,
                     )
-                for acceptance_ref in sorted(acceptance_ids - set(planned_acceptance)):
+                for acceptance_ref in sorted(
+                    set() if ledger else acceptance_ids - set(planned_acceptance)
+                ):
                     report.add(
                         "error",
                         "acceptance-plan-missing",
@@ -1982,8 +2164,13 @@ def _validate_records(
                 authorization = authorization if isinstance(authorization, dict) else {}
                 if (
                     _decision_disposition(authorization_decision) not in {"approve", "go", "commit"}
-                    or record.get("work_item_ref")
-                    not in _strings(authorization_decision.get("subject_refs"))
+                    or work_entry is None
+                    or not decision_covers(
+                        authorization_decision,
+                        work_entry[1],
+                        actor=producer,
+                        at=_parse_datetime(record.get("observed_at")),
+                    )
                     or producer not in _strings(authorization.get("actor_refs"))
                 ):
                     report.add(
@@ -2198,7 +2385,14 @@ def _validate_records(
                 authorization = authorization if isinstance(authorization, dict) else {}
                 if (
                     _decision_disposition(decision) in {"approve", "go", "commit"}
-                    and work_ref in _strings(decision.get("subject_refs"))
+                    and decision_covers(
+                        decision,
+                        work,
+                        actor=producer,
+                        at=_parse_datetime(decision.get("decided_at"))
+                        if packet.get("status") in {"ready_for_review", "accepted"}
+                        else None,
+                    )
                     and producer in _strings(authorization.get("actor_refs"))
                     and elevated <= set(_strings(authorization.get("permission_classes")))
                     and (
@@ -2300,11 +2494,16 @@ def _validate_records(
                 if (
                     review.get("result") == "pass"
                     and review.get("work_item_ref") == work_ref
-                    and review_run
-                    and review_run != producer_run
-                    and producer_context
-                    and review_context
-                    and producer_context != review_context
+                    and (
+                        _independent_evidence(review)
+                        or (
+                            review_run
+                            and review_run != producer_run
+                            and producer_context
+                            and review_context
+                            and producer_context != review_context
+                        )
+                    )
                 ):
                     valid_review = True
                     break
@@ -2372,6 +2571,7 @@ def _validate_records(
             | set(evidence_by_id)
             | set(decisions_by_id)
             | set(catalog.capabilities)
+            | set(catalog.workflows)
             | {str(program_payload.get("id"))}
         )
         for subject_ref in sorted(set(_strings(decision.get("subject_refs"))) - resolvable_subjects):
@@ -2381,6 +2581,9 @@ def _validate_records(
                 f"Decision subject {subject_ref!r} cannot be resolved",
                 decision_path,
             )
+
+    _validate_standing_authorizations(parsed, catalog, report)
+    _validate_claim_coverage(parsed, catalog, report)
 
     learning_ids = {
         record["id"]
@@ -2422,6 +2625,8 @@ def _validate_records(
         risk = work.get("risk") if isinstance(work.get("risk"), dict) else {}
         assurance = risk.get("assurance_level")
         workflow = catalog.workflows.get(_record_workflow_id(work) or "", {})
+        if is_ledger(workflow):
+            continue
         if assurance_rank(assurance) < 0 or not _review_reached(work, workflow):
             continue
         packet_refs = _strings(work.get("work_packet_refs"))
@@ -2501,8 +2706,10 @@ def _validate_records(
                     if isinstance(evidence_producer_value, dict)
                     else None
                 )
+                independent = _independent_evidence(evidence)
                 if (
                     assurance_rank(assurance) >= 2
+                    and not independent
                     and producer
                     and evidence_producer
                     and producer == evidence_producer
@@ -2513,10 +2720,14 @@ def _validate_records(
                         f"{assurance} verification evidence must be produced independently from the work packet",
                         evidence_path,
                     )
-                if assurance_rank(assurance) >= 2 and (
-                    not packet_context
-                    or not evidence_context
-                    or packet_context == evidence_context
+                if (
+                    assurance_rank(assurance) >= 2
+                    and not independent
+                    and (
+                        not packet_context
+                        or not evidence_context
+                        or packet_context == evidence_context
+                    )
                 ):
                     report.add(
                         "error",
@@ -2646,6 +2857,108 @@ def _validate_records(
                         f"({acceptance_ref}, {expected_kind}, {expected_environment})",
                         work_path,
                     )
+
+
+def _event_approval_refs(record: dict[str, Any]) -> set[str]:
+    state = record.get("state")
+    history = state.get("history") if isinstance(state, dict) else record.get("transition_history")
+    refs: set[str] = set()
+    for event in history if isinstance(history, list) else []:
+        if isinstance(event, dict):
+            refs.update(_strings(event.get("approval_refs")))
+    return refs
+
+
+def _validate_standing_authorizations(
+    parsed: dict[str, list[tuple[Path, dict[str, Any]]]],
+    catalog: Catalog,
+    report: ValidationReport,
+) -> None:
+    work_ids = {
+        record["id"] for _, record in parsed["work"] if isinstance(record.get("id"), str)
+    }
+    for path, decision in parsed["decisions"]:
+        if not is_standing(decision):
+            continue
+        authorization = authorization_of(decision)
+        targets = _strings(authorization.get("applies_to"))
+        if not targets:
+            report.add(
+                "error",
+                "standing-applies-to-missing",
+                "A standing authorization must list applies_to (work ids, workflow ids, or '*')",
+                path,
+            )
+        for target in sorted(set(targets) - {"*"} - work_ids - set(catalog.workflows)):
+            report.add(
+                "error",
+                "standing-applies-to-unknown",
+                f"Standing authorization applies_to {target!r} is neither a work item nor a workflow",
+                path,
+            )
+        if _decision_disposition(decision) not in APPROVING_DISPOSITIONS:
+            report.add(
+                "error",
+                "standing-authorization-disposition",
+                "A standing authorization must carry an approving disposition",
+                path,
+            )
+        if not standing_expired(decision):
+            continue
+        decision_id = decision.get("id")
+        open_citers = sorted(
+            record["id"]
+            for _, record in parsed["work"]
+            if isinstance(record.get("id"), str)
+            and (
+                decision_id in _strings(record.get("decision_refs"))
+                or decision_id in _event_approval_refs(record)
+            )
+            and _record_state(record)
+            not in set(
+                _strings(catalog.workflows.get(_record_workflow_id(record) or "", {}).get("terminal_states"))
+            )
+        )
+        if open_citers:
+            report.add(
+                "warning",
+                "standing-authorization-expired",
+                f"Standing authorization {decision_id!r} expired "
+                f"{authorization.get('expires_at')} but open work still references it: "
+                + ", ".join(open_citers),
+                path,
+            )
+
+
+def _validate_claim_coverage(
+    parsed: dict[str, list[tuple[Path, dict[str, Any]]]],
+    catalog: Catalog,
+    report: ValidationReport,
+) -> None:
+    for path, work in parsed["work"]:
+        results = work.get("results")
+        claims = _strings(results.get("claims")) if isinstance(results, dict) else []
+        risk = work.get("risk") if isinstance(work.get("risk"), dict) else {}
+        workflow = catalog.workflows.get(_record_workflow_id(work) or "", {})
+        if (
+            not claims
+            or is_ledger(workflow)
+            or assurance_rank(risk.get("assurance_level")) < 1
+            or not _review_reached(work, workflow)
+        ):
+            continue
+        covered: set[str] = set()
+        for _, evidence in parsed["evidence"]:
+            if evidence.get("work_item_ref") == work.get("id") and evidence.get("result") == "pass":
+                covered.update(_strings(evidence.get("coverage")))
+        for claim in claims:
+            if claim not in covered:
+                report.add(
+                    "warning",
+                    "claim-not-covered",
+                    f"Claim {claim!r} is not covered by any passing evidence coverage list",
+                    path,
+                )
 
 
 def validate_project(
@@ -2862,6 +3175,13 @@ def validate_framework(root: Path) -> ValidationReport:
                     f"Workflow state {state!r} is unreachable from {initial_state!r}",
                     path,
                 )
+        if "record_mode" in workflow and workflow["record_mode"] not in RECORD_MODES:
+            report.add(
+                "error",
+                "workflow-record-mode",
+                f"Workflow record_mode must be one of {', '.join(RECORD_MODES)}",
+                path,
+            )
         for state in _strings(workflow.get("assurance_states")):
             if state not in states:
                 report.add(
@@ -2998,14 +3318,31 @@ def validate_framework(root: Path) -> ValidationReport:
     return report
 
 
-def render_report(report: ValidationReport, *, as_json: bool = False) -> str:
+def _limited_issues(report: ValidationReport, max_issues: int | None) -> tuple[list[Issue], int]:
+    if max_issues is None or len(report.issues) <= max_issues:
+        return list(report.issues), 0
+    # Errors first, so a truncated view never hides what blocks the run.
+    ordered = sorted(report.issues, key=lambda issue: issue.severity != "error")
+    return ordered[: max(max_issues, 0)], len(ordered) - max(max_issues, 0)
+
+
+def render_report(
+    report: ValidationReport, *, as_json: bool = False, max_issues: int | None = None
+) -> str:
+    shown, omitted = _limited_issues(report, max_issues)
     if as_json:
-        return json.dumps(report.as_dict(), indent=2, sort_keys=True)
+        data = report.as_dict()
+        if omitted:
+            data["issues"] = [issue.as_dict() for issue in shown]
+            data["issues_omitted"] = omitted
+        return json.dumps(data, indent=2, sort_keys=True)
     lines = [
         f"Validation {'passed' if report.ok else 'failed'}: "
         f"{len(report.errors)} error(s), {len(report.warnings)} warning(s)"
     ]
-    for issue in report.issues:
+    for issue in shown:
         location = f" [{issue.path}]" if issue.path else ""
         lines.append(f"- {issue.severity.upper()} {issue.code}: {issue.message}{location}")
+    if omitted:
+        lines.append(f"... {omitted} more issue(s) not shown (showing {len(shown)} of {len(report.issues)})")
     return "\n".join(lines)

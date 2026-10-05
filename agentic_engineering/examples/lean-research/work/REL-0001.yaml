@@ -1,0 +1,72 @@
+schema_version: 1
+framework_version: 0.1.0
+work_item:
+  id: REL-0001
+  title: Publish the baseline results
+  type: release
+  workflow: release
+  state:
+    current: draft
+    history:
+    - sequence: 1
+      event: create
+      from: null
+      to: draft
+      at: '2026-10-04T09:00:00Z'
+      actor: human:owner
+      guard_refs: []
+      confirmed_guard_refs: []
+  source_refs:
+  - program:lean-research
+  source_revision: '1'
+  objective: Publish the RUN-0001 baseline error rate in the model card, citing its results file and stating
+    what was not established.
+  accountable_human: human:owner
+  required_capabilities:
+  - code_quality
+  - documentation_feedback
+  - operability_release
+  - requirements
+  - research_assurance
+  - verification
+  change:
+    surfaces:
+    - library
+    changed_paths: []
+    production_affecting: true
+    authentication: false
+    authorization: false
+    sensitive_data: false
+    safety_impact: none
+    regulated_impact: false
+    destructive_migration: false
+    external_write: true
+    reversibility: moderate
+    blast_radius: component
+  risk:
+    declared_tier: high
+    effective_tier: high
+    assurance_level: A2
+    rule_refs:
+    - FACT-EXTERNAL-WRITE
+    - FACT-PRODUCTION
+    - RISK-PROD
+  route: release
+  acceptance:
+  - id: AC-REL-0001-1
+    statement: The model card quotes only claims the RUN-0001 results file supports and lists what was
+      not established.
+  evidence_plan:
+  - acceptance_ref: AC-REL-0001-1
+    kinds:
+    - deployment_receipt
+    - monitoring_observation
+    - regression_test
+    environment: compute_cluster
+    minimum_assurance: A2
+  permission_classes:
+  - external_write
+  - local_write
+  - production
+  dependency_refs:
+  - RUN-0001

@@ -58,3 +58,5 @@ assurance_policy:
     - A self-authored independence assertion does not satisfy A2 or A3.
     - An unverifiable agent run may contribute evidence but cannot be the independent validator at A2 or A3.
     - Deterministic automation can supply evidence but cannot supply accountable approval.
+    - Evidence anchored to an artifact fixed outside the producing run (independence.kind gold_set, readback, or preregistered_bar with fixed_before_read, each with a ref) satisfies the distinct run, actor and context requirements even from the same agent; it never satisfies human acceptance or A3 specialist review.
+    - Ledger workflows (record_mode ledger) record results by reference and are limited to low and medium risk.

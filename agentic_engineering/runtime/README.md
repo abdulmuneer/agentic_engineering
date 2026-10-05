@@ -13,13 +13,14 @@ duties, and source-of-truth consistency inspectable and enforceable.
 | `agentic tailor` | Record accountable-human confirmation of the project-specific operating model. |
 | `agentic new-work` | Create a canonical YAML draft with placeholders and unknown consequence facts. |
 | `agentic new-packet` | Create a draft execution packet and atomically link it to work. |
-| `agentic new-decision` | Record an explicit decision, optional permission grant or risk acceptance, and backlinks. |
+| `agentic new-decision` | Record an explicit decision, optional permission grant, standing authorization (`--standing`, `--applies-to`) or risk acceptance, and backlinks. |
 | `agentic new-evidence` | Record an explicit-result evidence or action receipt and link it to a packet. |
-| `agentic route` | Compute effective risk, minimum assurance, capabilities, evidence, and permission ceiling. |
+| `agentic route` | Compute effective risk, minimum assurance, capabilities, evidence, and permission ceiling; `--write` records them in the work item. |
 | `agentic transition` | Move work through a workflow using canonical fields and typed guard receipts. |
-| `agentic validate` | Validate the project, source pin, framework lock, records, evidence, independence, and views. |
+| `agentic validate` | Validate the project, source pin, framework lock, records, evidence, independence, and views; `--max-issues N` keeps the report short. |
 | `agentic validate-framework` | Validate catalogs, role metadata, workflows, schemas, and presets. |
-| `agentic render` | Regenerate disposable operating-model, coverage, active-work, and AGENTS views. |
+| `agentic render` | Regenerate disposable operating-model, coverage, active-work, decisions, and AGENTS views. |
+| `agentic status` | One line per work item (workflow, state, risk tier, open human gates), then standing authorizations with expiry and decisions with revisit dates. |
 | `agentic upgrade` | Compare or update the version plus catalog/schema/behavior framework lock. |
 | `agentic source-update` | Rebaseline the authoritative plan through a bound accountable decision. |
 
@@ -73,7 +74,58 @@ Strict validation fails while tailoring is pending. `init` also writes a managed
 pointer in the product's root `AGENTS.md`; generated guidance remains under
 `.agentic/generated/`.
 
-## Work Records And Transitions
+## Lean Runs
+
+Workflows with `record_mode: ledger` (the catalog's `run` workflow) need no
+evidence plan, work packets, evidence records or assurance receipts. Guards
+derive from canonical fields: objective and acceptance to start, and a `results`
+block to close:
+
+```yaml
+results:
+  ref: runs/measure-x/results.md
+  receipts:
+    - uri: gs://bucket/measure-x/eval.json
+      sha256: <64-hex>
+  not_established:
+    - Not measured on recordings longer than 30 s.
+```
+
+```bash
+agentic new-work RUN-0001 --title "Measure X on Y" --workflow run --root /path/to/product
+# assess the consequence facts, then:
+agentic route RUN-0001 --root /path/to/product --write
+agentic transition RUN-0001 running --root /path/to/product --actor agent:planner
+agentic transition RUN-0001 closed --root /path/to/product --actor agent:planner
+agentic status /path/to/product
+```
+
+A ledger item whose effective risk is high or critical fails validation
+(`ledger-consequential-risk`); route it through a gated workflow. A new item with
+unassessed facts reads as high until they are filled in.
+
+## Standing Authorizations, Tiers, Budgets And Independence
+
+- A decision with `authorization.standing: true`, an approving outcome, an
+  `expires_at` and `applies_to` (work item ids, workflow ids or `*`) satisfies
+  approval references for every matching item whose transition actor is in
+  `actor_refs` and whose permissions fit `permission_classes`. Expired standing
+  decisions satisfy nothing; history is judged as of each event, and open items
+  still citing an expired one get a warning.
+- Agent actors may declare `tier` (`planner`, `worker`, `executor`), `model`,
+  `turn_cap` and `budget_tokens`. Executors are limited to `local_write` and may
+  not own or review a capability; a tier on a human is an error.
+- `program.budgets` holds per-run tokens, context tokens, a coordination rule and
+  human review minutes per day; `program.resources` lists shared capacity with an
+  owner that must resolve to a declared actor.
+- Evidence `independence` with kind `gold_set`, `readback`, or
+  `preregistered_bar` (with `fixed_before_read: true`) and a non-empty `ref`
+  satisfies distinct-run, distinct-actor and isolated-context requirements.
+  Human acceptance and A3 requirements are unchanged. When a work item lists
+  `results.claims`, a claim not covered by any passing evidence's `coverage`
+  warns at A1 and above.
+
+## Work Records And Transitions (gated workflows)
 
 ```bash
 agentic new-work WORK-0001 \
@@ -88,7 +140,7 @@ for its objective and acceptance. Edit the canonical YAML under
 capabilities, permissions, and the evidence plan with the computed route:
 
 ```bash
-agentic route WORK-0001 --root /path/to/product
+agentic route WORK-0001 --root /path/to/product --write
 agentic render /path/to/product
 agentic validate /path/to/product --strict
 ```
@@ -105,7 +157,8 @@ agentic transition WORK-0001 in_progress \
 ```
 
 Evidence receipts must be passing and bound to the work item. Approval references
-must resolve to an approving decision whose `subject_refs` includes the work item.
+must resolve to an approving decision whose `subject_refs` includes the work item,
+or to an unexpired standing authorization that covers it.
 Each manually confirmed guard must also appear in that receipt's
 `guard_authorizations`; bare confirmation strings, missing IDs, and unrelated
 receipts are rejected.
